@@ -51,7 +51,7 @@ test('blogdown', {
 
     sinon.assert.calledOnce(processor.process);
     sinon.assert.calledWith(processor.process, [{ some : 'item' }],
-        this.options);
+        'some/source', this.options);
   },
 
 
