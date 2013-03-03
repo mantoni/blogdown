@@ -19,12 +19,12 @@ var fileReader   = require('../lib/file-reader');
 test('reader', {
 
   before: function () {
-    sinon.stub(folderReader, 'read');
+    sinon.stub(folderReader, 'readFiles');
     sinon.stub(fileReader, 'read');
   },
 
   after: function () {
-    folderReader.read.restore();
+    folderReader.readFiles.restore();
     fileReader.read.restore();
   },
 
@@ -32,13 +32,13 @@ test('reader', {
   'reads the given directory with folder-reader': function () {
     reader.read('a/b/c', function () {});
 
-    sinon.assert.calledOnce(folderReader.read);
-    sinon.assert.calledWith(folderReader.read, 'a/b/c');
+    sinon.assert.calledOnce(folderReader.readFiles);
+    sinon.assert.calledWith(folderReader.readFiles, 'a/b/c');
   },
 
 
   'passes folder-reader results to file-reader': function () {
-    folderReader.read.yields(null, ['a/b', 'c/d']);
+    folderReader.readFiles.yields(null, ['a/b', 'c/d']);
 
     reader.read('x/y/z', function () {});
 
@@ -49,7 +49,7 @@ test('reader', {
 
 
   'splits up item aspartial and item': function () {
-    folderReader.read.yields(null, ['some.json']);
+    folderReader.readFiles.yields(null, ['some.json']);
     fileReader.read.yields(null, {
       fileName : 'test',
       html     : '<i>hi</i>',
@@ -70,7 +70,7 @@ test('reader', {
 
 
   'adds timestamp to result': sinon.test(function () {
-    folderReader.read.yields(null, ['a/b']);
+    folderReader.readFiles.yields(null, ['a/b']);
     fileReader.read.yields(null, { fileName : 'test', some : 'data' });
     var spy = sinon.spy();
 
