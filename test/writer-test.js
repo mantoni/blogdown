@@ -32,11 +32,11 @@ test('writer', {
     }, {
       fileName : 'file2',
       html     : '<h2>bar</h2>'
-    }], function () {});
+    }], 'site', function () {});
 
     sinon.assert.calledTwice(fs.writeFile);
-    sinon.assert.calledWith(fs.writeFile, 'file1.html',  '<h1>foo</h1>');
-    sinon.assert.calledWith(fs.writeFile, 'file2.html',  '<h2>bar</h2>');
+    sinon.assert.calledWith(fs.writeFile, 'site/file1.html',  '<h1>foo</h1>');
+    sinon.assert.calledWith(fs.writeFile, 'site/file2.html',  '<h2>bar</h2>');
   },
 
 
@@ -49,7 +49,7 @@ test('writer', {
     }, {
       fileName : 'file2',
       html     : '<h2>bar</h2>'
-    }], spy);
+    }], '.', spy);
 
     sinon.assert.notCalled(spy);
 

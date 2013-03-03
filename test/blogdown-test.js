@@ -75,7 +75,7 @@ test('blogdown', {
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(writer.write);
-    sinon.assert.calledWith(writer.write, files);
+    sinon.assert.calledWith(writer.write, files, 'some/target');
   },
 
 
