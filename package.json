@@ -6,6 +6,7 @@
   "author"          : "Maximilian Antoni (http://maxantoni.de)",
   "homepage"        : "http://mantoni.github.com/blogdown",
   "main"            : "./lib/blogdown.js",
+  "bin"             : "bin/blogdown.bin.js",
   "engines"         : {
     "node"          : ">=0.8"
   },
