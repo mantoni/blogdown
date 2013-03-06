@@ -121,6 +121,7 @@ test('file-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
+      path     : 'some/test',
       fileName : 'test',
       some     : 'json',
       md       : '<p><em>markdown</em></p>'

@@ -20,11 +20,13 @@ test('reader', {
 
   before: function () {
     sinon.stub(folderReader, 'readFiles');
+    sinon.stub(folderReader, 'readFolders');
     sinon.stub(fileReader, 'read');
   },
 
   after: function () {
     folderReader.readFiles.restore();
+    folderReader.readFolders.restore();
     fileReader.read.restore();
   },
 
@@ -34,10 +36,12 @@ test('reader', {
 
     sinon.assert.calledOnce(folderReader.readFiles);
     sinon.assert.calledWith(folderReader.readFiles, 'a/b/c');
+    sinon.assert.calledOnce(folderReader.readFolders);
+    sinon.assert.calledWith(folderReader.readFolders, 'a/b/c');
   },
 
 
-  'passes folder-reader results to file-reader': function () {
+  'passes readFiles results to file-reader': function () {
     folderReader.readFiles.yields(null, ['a/b', 'c/d']);
 
     reader.read('x/y/z', function () {});
@@ -48,9 +52,22 @@ test('reader', {
   },
 
 
-  'splits up item aspartial and item': function () {
+  'passes readFolders results to folder-reader': function () {
+    folderReader.readFolders.yields(null, ['a/b', 'c/d']);
+
+    reader.read('x/y/z', function () {});
+
+    sinon.assert.calledThrice(folderReader.readFiles);
+    sinon.assert.calledWith(folderReader.readFiles, 'x/y/z/a/b');
+    sinon.assert.calledWith(folderReader.readFiles, 'x/y/z/c/d');
+  },
+
+
+  'splits up item as partial and item': function () {
+    folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['some.json']);
     fileReader.read.yields(null, {
+      path     : 'x/test',
       fileName : 'test',
       html     : '<i>hi</i>',
       some     : 'data'
@@ -61,17 +78,71 @@ test('reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
-      items    : [sinon.match({ fileName : 'test', some : 'data' })],
-      partials : {
-        test   : '<i>hi</i>'
+      items      : [sinon.match({
+        path     : 'x/test',
+        fileName : 'test',
+        some     : 'data'
+      })],
+      partials   : {
+        test     : '<i>hi</i>'
+      }
+    });
+  },
+
+
+  'adds folder items by name to items and partials': function () {
+    folderReader.readFolders.yields(null, ['folder']);
+    folderReader.readFiles.yields(null, ['some.json']);
+    var spy = sinon.spy();
+
+    reader.read('x', spy);
+    fileReader.read.firstCall.invokeCallback(null, {
+      path     : 'x/test',
+      fileName : 'test',
+      html     : '<i>hi</i>',
+      some     : 'data'
+    });
+    fileReader.read.secondCall.invokeCallback(null, {
+      path     : 'x/folder/name',
+      fileName : 'name',
+      html     : '<i>there</i>',
+      some     : 42
+    });
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, {
+      items             : [sinon.match({
+        path            : 'x/test',
+        fileName        : 'test',
+        some            : 'data',
+        folder          : {
+          name          : sinon.match({
+            path        : 'x/folder/name',
+            fileName    : 'name',
+            some        : 42
+          })
+        }
+      }), sinon.match({
+        path            : 'x/folder/name',
+        fileName        : 'name',
+        some            : 42
+      })],
+      partials          : {
+        test            : '<i>hi</i>',
+        'folder.name'   : '<i>there</i>'
       }
     });
   },
 
 
   'adds timestamp to result': sinon.test(function () {
+    folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['a/b']);
-    fileReader.read.yields(null, { fileName : 'test', some : 'data' });
+    fileReader.read.yields(null, {
+      path     : 'test',
+      fileName : 'test',
+      some     : 'data'
+    });
     var spy = sinon.spy();
 
     reader.read('x', spy);
