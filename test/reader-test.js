@@ -14,6 +14,7 @@ var sinon        = require('sinon');
 var reader       = require('../lib/reader');
 var folderReader = require('../lib/folder-reader');
 var fileReader   = require('../lib/file-reader');
+var itemLinker   = require('../lib/item-linker');
 
 
 test('reader', {
@@ -151,6 +152,30 @@ test('reader', {
     sinon.assert.calledWithMatch(spy, null, {
       items : [sinon.match.has('timestamp', '1970-01-01T01:00:00+01:00')]
     });
+  }),
+
+
+  'passes items to itemLinker.previousNext': sinon.test(function () {
+    this.stub(itemLinker, 'previousNext');
+    folderReader.readFolders.yields(null, []);
+    folderReader.readFiles.yields(null, ['a', 'b']);
+    var firstItem = {
+      path     : 'x/test',
+      fileName : 'test',
+      some     : 'data'
+    };
+    var secondItem = {
+      path     : 'x/folder/name',
+      fileName : 'name',
+      some     : 42
+    };
+
+    reader.read('x', function () {});
+    fileReader.read.firstCall.invokeCallback(null, firstItem);
+    fileReader.read.secondCall.invokeCallback(null, secondItem);
+
+    sinon.assert.calledOnce(itemLinker.previousNext);
+    sinon.assert.calledWith(itemLinker.previousNext, [firstItem, secondItem]);
   })
 
 });
@@ -179,7 +204,7 @@ test('reader integration', {
       assert.equal(result.items[1].b, 42);
 
       assert.strictEqual(result.items[0].next, result.items[1]);
-      assert.strictEqual(result.items[1].prev, result.items[0]);
+      assert.strictEqual(result.items[1].previous, result.items[0]);
     });
   }
 
