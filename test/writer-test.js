@@ -20,14 +20,17 @@ test('writer', {
   before: function () {
     sinon.stub(fs, 'writeFile');
     sinon.stub(fs, 'mkdir');
+    sinon.stub(fs, 'exists');
   },
 
   after: function () {
     fs.writeFile.restore();
     fs.mkdir.restore();
+    fs.exists.restore();
   },
 
   'writes the given items to files': function () {
+    fs.exists.yields(false);
     writer.write([{
       path : 'file1',
       html : '<h1>foo</h1>'
@@ -43,6 +46,7 @@ test('writer', {
 
 
   'yields once all files where written': function () {
+    fs.exists.yields(false);
     var spy = sinon.spy();
 
     writer.write([{
@@ -65,6 +69,7 @@ test('writer', {
   },
 
   'creates directory for path before writing file': function () {
+    fs.exists.yields(false);
     writer.write([{
       path : 'folder/file',
       html : ''
@@ -80,6 +85,7 @@ test('writer', {
   },
 
   'errs and does not create file if mkdir fails': function () {
+    fs.exists.yields(false);
     var spy = sinon.spy();
     var err = new Error();
     fs.mkdir.yields(err);
@@ -92,6 +98,20 @@ test('writer', {
     sinon.assert.notCalled(fs.writeFile);
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
+  },
+
+  'does not mkdir if folder already exists': function () {
+    fs.exists.yields(true);
+
+    writer.write([{
+      path : 'folder/file',
+      html : ''
+    }], 'target', function () {});
+
+    sinon.assert.calledOnce(fs.exists);
+    sinon.assert.calledWith(fs.exists, 'target/folder');
+    sinon.assert.notCalled(fs.mkdir);
+    sinon.assert.calledOnce(fs.writeFile);
   }
 
 });
