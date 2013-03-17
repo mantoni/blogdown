@@ -31,17 +31,18 @@ test('writer', {
 
   'writes the given items to files': function () {
     fs.exists.yields(false);
+
     writer.write([{
-      path : 'file1',
-      html : '<h1>foo</h1>'
+      path : 'file1.html',
+      data : '<h1>foo</h1>'
     }, {
-      path : 'file2',
-      html : '<h2>bar</h2>'
+      path : 'file2.json',
+      data : '{"h1":"bar"}'
     }], 'site', function () {});
 
     sinon.assert.calledTwice(fs.writeFile);
     sinon.assert.calledWith(fs.writeFile, 'site/file1.html',  '<h1>foo</h1>');
-    sinon.assert.calledWith(fs.writeFile, 'site/file2.html',  '<h2>bar</h2>');
+    sinon.assert.calledWith(fs.writeFile, 'site/file2.json',  '{"h1":"bar"}');
   },
 
 
@@ -50,11 +51,11 @@ test('writer', {
     var spy = sinon.spy();
 
     writer.write([{
-      path : 'file1',
-      html : '<h1>foo</h1>'
+      path : 'file1.html',
+      data : ''
     }, {
-      path : 'file2',
-      html : '<h2>bar</h2>'
+      path : 'file2.json',
+      data : ''
     }], '.', spy);
 
     sinon.assert.notCalled(spy);
@@ -71,8 +72,8 @@ test('writer', {
   'creates directory for path before writing file': function () {
     fs.exists.yields(false);
     writer.write([{
-      path : 'folder/file',
-      html : ''
+      path : 'folder/file.json',
+      data : ''
     }], 'target', function () {});
 
     sinon.assert.notCalled(fs.writeFile);
@@ -91,8 +92,8 @@ test('writer', {
     fs.mkdir.yields(err);
 
     writer.write([{
-      path : 'folder/file',
-      html : ''
+      path : 'folder/file.json',
+      data : ''
     }], '.', spy);
 
     sinon.assert.notCalled(fs.writeFile);
@@ -104,8 +105,8 @@ test('writer', {
     fs.exists.yields(true);
 
     writer.write([{
-      path : 'folder/file',
-      html : ''
+      path : 'folder/file.json',
+      data : ''
     }], 'target', function () {});
 
     sinon.assert.calledOnce(fs.exists);

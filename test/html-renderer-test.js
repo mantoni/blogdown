@@ -43,8 +43,8 @@ test('renderer', {
     });
 
     assert.deepEqual(result, [{
-      path : 'test',
-      html : '<div><p>from markdown</p></div>'
+      path : 'test.html',
+      data : '<div><p>from markdown</p></div>'
     }]);
   },
 
@@ -59,8 +59,8 @@ test('renderer', {
     });
 
     assert.deepEqual(result, [{
-      path : 'test',
-      html : '<div><h1>stuff</h1></div>'
+      path : 'test.html',
+      data : '<div><h1>stuff</h1></div>'
     }]);
   },
 
@@ -86,8 +86,8 @@ test('renderer', {
 
     sinon.assert.notCalled(console.warn);
     assert.deepEqual(result, [{
-      path : 'some/file',
-      html : '<em>Yeah!</em>'
+      path : 'some/file.html',
+      data : '<em>Yeah!</em>'
     }]);
   }
 
