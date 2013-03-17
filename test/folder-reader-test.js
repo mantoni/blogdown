@@ -40,13 +40,13 @@ test('folder-reader readFiles', {
   },
 
 
-  'invokes given callback with json file names': testFileNames('json'),
+  'invokes given callback with json files': testFileNames('json'),
 
-  'invokes given callback with md file names': testFileNames('md'),
+  'invokes given callback with md files': testFileNames('md'),
 
-  'invokes given callback with html file names': testFileNames('html'),
+  'invokes given callback with html files': testFileNames('html'),
 
-  'invokes given callback with mustache file names': testFileNames('mustache'),
+  'invokes given callback with mustache files': testFileNames('mustache'),
 
   'yields error if readdir fails': function () {
     var err = new Error('Oups!');
