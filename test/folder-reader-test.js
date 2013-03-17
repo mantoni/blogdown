@@ -15,6 +15,20 @@ var folderReader = require('../lib/folder-reader');
 var fs           = require('fs');
 
 
+function testFileNames(suffix) {
+  return function () {
+    fs.readdir.withArgs('some/test').yields(null,
+      ['a.' + suffix, 'b.doc', 'c.' + suffix, 'd.doc']);
+    var spy = sinon.spy();
+
+    folderReader.readFiles('some/test', spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, ['a', 'c']);
+  };
+}
+
+
 test('folder-reader readFiles', {
 
   before: function () {
@@ -26,17 +40,13 @@ test('folder-reader readFiles', {
   },
 
 
-  'invokes given callback with [json|md|html] file names': function () {
-    fs.readdir.withArgs('some/test').yields(null,
-      ['a.md', 'a.json', 'b.md', 'c.json', 'd.doc', 'foo', 'd.html']);
-    var spy = sinon.spy();
+  'invokes given callback with json file names': testFileNames('json'),
 
-    folderReader.readFiles('some/test', spy);
+  'invokes given callback with md file names': testFileNames('md'),
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, ['a', 'b', 'c', 'd']);
-  },
+  'invokes given callback with html file names': testFileNames('html'),
 
+  'invokes given callback with mustache file names': testFileNames('mustache'),
 
   'yields error if readdir fails': function () {
     var err = new Error('Oups!');

@@ -95,7 +95,20 @@ test('file-reader', {
   },
 
 
-  'errs if hmtl file cannot be read': function () {
+  'reads and returns mustache in a json object': function () {
+    fs.exists.withArgs('some/test.mustache').yields(true);
+    fs.readFile.withArgs('some/test.mustache').yields(null,
+        new Buffer('<b>{{mustache}}</b>'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, { html : '<b>{{mustache}}</b>' });
+  },
+
+
+  'errs if html file cannot be read': function () {
     var err = new Error('Oups!');
     fs.exists.withArgs('some/test.html').yields(true);
     fs.readFile.withArgs('some/test.html').yields(err);
