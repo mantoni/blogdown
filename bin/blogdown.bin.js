@@ -23,8 +23,19 @@ fileReader.read('options', function (err, options) {
 
   blogdown('src', 'site', options, function (err) {
     if (err) {
-      process.stderr.write(err.toString());
-      process.stderr.write('\n');
+      if (err.errors) {
+        process.stderr.write(err.toString());
+        process.stderr.write('\n');
+        err.errors.forEach(function (error) {
+          process.stderr.write('\n');
+          process.stderr.write(error.stack);
+          process.stderr.write('\n');
+        });
+      } else {
+        process.stderr.write('\n');
+        process.stderr.write(err.stack);
+        process.stderr.write('\n');
+      }
     } else {
       process.stdout.write('DONE\n');
     }

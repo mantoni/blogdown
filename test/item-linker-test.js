@@ -17,31 +17,31 @@ var itemLinker = require('../lib/item-linker');
 test('item-linker previousNext', {
 
   'links two items': function () {
-    var first  = {};
-    var second = {};
+    var first  = { link : {} };
+    var second = { link : {} };
 
     itemLinker.previousNext([first, second]);
 
-    assert.strictEqual(first.next, second);
-    assert.strictEqual(second.next, null);
-    assert.strictEqual(second.previous, first);
-    assert.strictEqual(first.previous, null);
+    assert.strictEqual(first.link.next, second);
+    assert.strictEqual(second.link.next, null);
+    assert.strictEqual(second.link.previous, first);
+    assert.strictEqual(first.link.previous, null);
   },
 
 
   'links three items': function () {
-    var first  = {};
-    var second = {};
-    var third  = {};
+    var first  = { link : {} };
+    var second = { link : {} };
+    var third  = { link : {} };
 
     itemLinker.previousNext([first, second, third]);
 
-    assert.strictEqual(first.next, second);
-    assert.strictEqual(second.next, third);
-    assert.strictEqual(third.next, null);
-    assert.strictEqual(third.previous, second);
-    assert.strictEqual(second.previous, first);
-    assert.strictEqual(first.previous, null);
+    assert.strictEqual(first.link.next, second);
+    assert.strictEqual(second.link.next, third);
+    assert.strictEqual(third.link.next, null);
+    assert.strictEqual(third.link.previous, second);
+    assert.strictEqual(second.link.previous, first);
+    assert.strictEqual(first.link.previous, null);
   }
 
 });

@@ -68,10 +68,12 @@ test('reader', {
     folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['some.json']);
     fileReader.read.yields(null, {
-      path     : 'x/test',
-      fileName : 'test',
-      html     : '<i>hi</i>',
-      some     : 'data'
+      meta       : {
+        path     : 'x/test',
+        fileName : 'test'
+      },
+      html       : '<i>hi</i>',
+      some       : 'data'
     });
     var spy = sinon.spy();
 
@@ -80,8 +82,6 @@ test('reader', {
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
       items      : [sinon.match({
-        path     : 'test',
-        fileName : 'test',
         some     : 'data'
       })],
       partials   : {
@@ -98,42 +98,30 @@ test('reader', {
 
     reader.read('x', spy);
     fileReader.read.firstCall.invokeCallback(null, {
-      path     : 'x/test',
-      fileName : 'test',
-      html     : '<i>hi</i>',
-      some     : 'data'
+      meta       : {
+        path     : 'x/test',
+        fileName : 'test'
+      },
+      html       : '<i>hi</i>',
+      some       : 'data'
     });
     fileReader.read.secondCall.invokeCallback(null, {
-      path     : 'x/folder/name',
-      fileName : 'name',
-      html     : '<i>there</i>',
-      some     : 42
+      meta       : {
+        path     : 'x/folder/name',
+        fileName : 'name'
+      },
+      html       : '<i>there</i>',
+      some       : 42
     });
 
     sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, {
-      items             : [sinon.match({
-        path            : 'test',
-        fileName        : 'test',
-        some            : 'data',
-        folder          : {
-          map           : {
-            name        : sinon.match({
-              path      : 'folder/name',
-              fileName  : 'name',
-              some      : 42
-            })
-          }
-        }
-      }), sinon.match({
-        path            : 'folder/name',
-        fileName        : 'name',
-        some            : 42
-      })],
-      partials          : {
-        test            : '<i>hi</i>',
-        'folder.name'   : '<i>there</i>'
-      }
+    var result    = spy.firstCall.args[1];
+    var firstItem = result.items[0];
+    assert.equal(firstItem.some, 'data');
+    assert.equal(firstItem.link.folder.map.name.some, 42);
+    assert.deepEqual(result.partials, {
+      test          : '<i>hi</i>',
+      'folder.name' : '<i>there</i>'
     });
   },
 
@@ -145,15 +133,19 @@ test('reader', {
 
     reader.read('x', spy);
     fileReader.read.firstCall.invokeCallback(null, {
-      path     : 'x/test',
-      fileName : 'test',
-      html     : '<i>hi</i>',
-      some     : 'data'
+      meta       : {
+        path     : 'x/test',
+        fileName : 'test'
+      },
+      html       : '<i>hi</i>',
+      some       : 'data'
     });
     fileReader.read.secondCall.invokeCallback(null, {
-      path     : 'x/folder/name',
-      fileName : 'name',
-      html     : '<i>there</i>'
+      meta       : {
+        path     : 'x/folder/name',
+        fileName : 'name'
+      },
+      html       : '<i>there</i>'
     });
 
     sinon.assert.calledOnce(spy);
@@ -173,34 +165,42 @@ test('reader', {
 
     reader.read('x', spy);
     fileReader.read.firstCall.invokeCallback(null, {
-      path     : 'x/test',
-      fileName : 'test',
-      some     : 'data'
+      meta       : {
+        path     : 'x/test',
+        fileName : 'test'
+      },
+      some       : 'data'
     });
     fileReader.read.secondCall.invokeCallback(null, {
-      path     : 'x/a/name',
-      fileName : 'name',
-      content  : 'a'
+      meta       : {
+        path     : 'x/a/name',
+        fileName : 'name'
+      },
+      content    : 'a'
     });
     fileReader.read.thirdCall.invokeCallback(null, {
-      path     : 'x/b/name',
-      fileName : 'name',
-      content  : 'b'
+      meta       : {
+        path     : 'x/b/name',
+        fileName : 'name'
+      },
+      content    : 'b'
     });
 
     var firstItem = spy.firstCall.args[1].items[0];
-    assert.equal(firstItem.a.list[0].content, 'a');
-    assert.equal(firstItem.b.list[0].content, 'b');
+    assert.equal(firstItem.link.a.list[0].content, 'a');
+    assert.equal(firstItem.link.b.list[0].content, 'b');
   },
 
 
-  'adds timestamp to result': sinon.test(function () {
+  'adds timestamp to meta': sinon.test(function () {
     folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['a/b']);
     fileReader.read.yields(null, {
-      path     : 'test',
-      fileName : 'test',
-      some     : 'data'
+      meta       : {
+        path     : 'test',
+        fileName : 'test'
+      },
+      some       : 'data'
     });
     var spy = sinon.spy();
 
@@ -208,9 +208,31 @@ test('reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWithMatch(spy, null, {
-      items : [sinon.match.has('timestamp', '1970-01-01T01:00:00+01:00')]
+      items : [sinon.match.has('meta',
+                sinon.match.has('timestamp', '1970-01-01T01:00:00+01:00'))]
     });
   }),
+
+
+  'adds link object to results': function () {
+    folderReader.readFolders.yields(null, []);
+    folderReader.readFiles.yields(null, ['a/b']);
+    fileReader.read.yields(null, {
+      meta       : {
+        path     : 'test',
+        fileName : 'test'
+      },
+      some       : 'data'
+    });
+    var spy = sinon.spy();
+
+    reader.read('x', spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      items : [sinon.match.has('link', sinon.match.object)]
+    });
+  },
 
 
   'passes items to itemLinker.previousNext': sinon.test(function () {
@@ -218,14 +240,18 @@ test('reader', {
     folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['a', 'b']);
     var firstItem = {
-      path     : 'x/test',
-      fileName : 'test',
-      some     : 'data'
+      meta       : {
+        path     : 'x/test',
+        fileName : 'test'
+      },
+      some       : 'data'
     };
     var secondItem = {
-      path     : 'x/folder/name',
-      fileName : 'name',
-      some     : 42
+      meta       : {
+        path     : 'x/folder/name',
+        fileName : 'name'
+      },
+      some       : 42
     };
 
     reader.read('x', function () {});
@@ -233,7 +259,8 @@ test('reader', {
     fileReader.read.secondCall.invokeCallback(null, secondItem);
 
     sinon.assert.calledOnce(itemLinker.previousNext);
-    sinon.assert.calledWith(itemLinker.previousNext, [firstItem, secondItem]);
+    sinon.assert.calledWith(itemLinker.previousNext,
+        [sinon.match.has('some', 'data'), sinon.match.has('some', 42)]);
   })
 
 });
@@ -254,15 +281,15 @@ test('reader integration', {
         doo : '<div>{{{bar.md}}}</div>'
       });
       assert.equal(result.items.length, 2);
-      assert.equal(result.items[0].fileName, 'bar');
+      assert.equal(result.items[0].meta.fileName, 'bar');
       assert.equal(result.items[0].x, 'text');
       assert.equal(result.items[0].md, '<p><em>hello world</em></p>');
-      assert.equal(result.items[1].fileName, 'foo');
+      assert.equal(result.items[1].meta.fileName, 'foo');
       assert.equal(result.items[1].a, 'abc');
       assert.equal(result.items[1].b, 42);
 
-      assert.strictEqual(result.items[0].next, result.items[1]);
-      assert.strictEqual(result.items[1].previous, result.items[0]);
+      assert.strictEqual(result.items[0].link.next, result.items[1]);
+      assert.strictEqual(result.items[1].link.previous, result.items[0]);
     });
   }
 

@@ -37,7 +37,7 @@ test('file-reader', {
     fileReader.read('some/test', spy);
 
     sinon.assert.calledOnce(spy);
-    sinon.assert.calledWithMatch(spy, null, {  some : 'json' });
+    sinon.assert.calledWithMatch(spy, null, { some : 'json' });
   },
 
 
@@ -133,11 +133,26 @@ test('file-reader', {
     fileReader.read('some/test', spy);
 
     sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, {
-      path     : 'some/test',
-      fileName : 'test',
-      some     : 'json',
-      md       : '<p><em>markdown</em></p>'
+    sinon.assert.calledWithMatch(spy, null, {
+      some : 'json',
+      md   : '<p><em>markdown</em></p>'
+    });
+  },
+
+
+  'adds fileName and path to meta object': function () {
+    fs.exists.withArgs('some/test.json').yields(true);
+    fs.readFile.withArgs('some/test.json').yields(null, new Buffer('{}'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      meta       : {
+        fileName : 'test',
+        path     : 'some/test'
+      }
     });
   }
 

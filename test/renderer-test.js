@@ -14,6 +14,9 @@ var sinon    = require('sinon');
 var renderer = require('../lib/renderer');
 
 
+var testMeta = { path : 'test' };
+
+
 test('renderer', {
 
   before: function () {
@@ -33,7 +36,7 @@ test('renderer', {
 
   'returns array with objects of path and html': function () {
     var result = renderer.render([{
-      path : 'test',
+      meta : testMeta,
       md   : '<p>from markdown</p>'
     }], {
       test : '<div>{{{md}}}</div>'
@@ -48,7 +51,7 @@ test('renderer', {
 
   'passes partials to mustache': function () {
     var result = renderer.render([{
-      path : 'test',
+      meta : testMeta,
       some : 'stuff'
     }], {
       test    : '<div>{{>heading}}</div>',
@@ -63,21 +66,21 @@ test('renderer', {
 
 
   'does not create file object if path is not a partial': function () {
-    var result = renderer.render([{ path : 'unknown' }], {});
+    var result = renderer.render([{ meta : { path : 'unknown' } }], {});
 
     assert.deepEqual(result, []);
   },
 
 
   'logs a warning if path is not a partial': function () {
-    renderer.render([{ path : 'unknown' }], {});
+    renderer.render([{ meta : { path : 'unknown' } }], {});
 
     sinon.assert.calledOnce(console.warn);
     sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown');
   },
 
   'replaces slash in path with dot to lookup partial': function () {
-    var result = renderer.render([{ path : 'some/file' }], {
+    var result = renderer.render([{ meta : { path : 'some/file' } }], {
       'some.file' : '<em>Yeah!</em>'
     });
 
@@ -89,4 +92,3 @@ test('renderer', {
   }
 
 });
-
