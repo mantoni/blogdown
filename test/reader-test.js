@@ -91,7 +91,7 @@ test('reader', {
   },
 
 
-  'adds folder items by name to items and partials': function () {
+  'adds folder items by name to item map and partials': function () {
     folderReader.readFolders.yields(null, ['folder']);
     folderReader.readFiles.yields(null, ['some.json']);
     var spy = sinon.spy();
@@ -117,11 +117,13 @@ test('reader', {
         fileName        : 'test',
         some            : 'data',
         folder          : {
-          name          : sinon.match({
-            path        : 'folder/name',
-            fileName    : 'name',
-            some        : 42
-          })
+          map           : {
+            name        : sinon.match({
+              path      : 'folder/name',
+              fileName  : 'name',
+              some      : 42
+            })
+          }
         }
       }), sinon.match({
         path            : 'folder/name',
@@ -161,6 +163,34 @@ test('reader', {
     sinon.assert.neverCalledWithMatch(spy, null, {
       items : [sinon.match.has('folder')]
     });
+  },
+
+
+  'adds child list': function () {
+    folderReader.readFiles.yields(null, ['some.json']);
+    folderReader.readFolders.yields(null, ['a', 'b']);
+    var spy = sinon.spy();
+
+    reader.read('x', spy);
+    fileReader.read.firstCall.invokeCallback(null, {
+      path     : 'x/test',
+      fileName : 'test',
+      some     : 'data'
+    });
+    fileReader.read.secondCall.invokeCallback(null, {
+      path     : 'x/a/name',
+      fileName : 'name',
+      content  : 'a'
+    });
+    fileReader.read.thirdCall.invokeCallback(null, {
+      path     : 'x/b/name',
+      fileName : 'name',
+      content  : 'b'
+    });
+
+    var firstItem = spy.firstCall.args[1].items[0];
+    assert.equal(firstItem.a.list[0].content, 'a');
+    assert.equal(firstItem.b.list[0].content, 'b');
   },
 
 
