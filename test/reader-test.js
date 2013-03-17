@@ -80,7 +80,7 @@ test('reader', {
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
       items      : [sinon.match({
-        path     : 'x/test',
+        path     : 'test',
         fileName : 'test',
         some     : 'data'
       })],
@@ -113,18 +113,18 @@ test('reader', {
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
       items             : [sinon.match({
-        path            : 'x/test',
+        path            : 'test',
         fileName        : 'test',
         some            : 'data',
         folder          : {
           name          : sinon.match({
-            path        : 'x/folder/name',
+            path        : 'folder/name',
             fileName    : 'name',
             some        : 42
           })
         }
       }), sinon.match({
-        path            : 'x/folder/name',
+        path            : 'folder/name',
         fileName        : 'name',
         some            : 42
       })],

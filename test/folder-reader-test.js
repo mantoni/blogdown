@@ -68,7 +68,7 @@ test('folder-reader readFolders', {
 
   'invokes given callback with folder names': function () {
     fs.readdir.withArgs('some/test').yields(null, ['a', 'b', 'c']);
-    fs.stat.withArgs('b').yields(null, {
+    fs.stat.withArgs('some/test/b').yields(null, {
       isDirectory : sinon.stub().returns(true)
     });
     var spy = sinon.spy();
@@ -95,7 +95,7 @@ test('folder-reader readFolders', {
   'yields error if stat fails': function () {
     fs.readdir.withArgs('some/test').yields(null, ['a', 'b', 'c']);
     var err = new Error('Oups!');
-    fs.stat.withArgs('b').yields(err);
+    fs.stat.withArgs('some/test/b').yields(err);
     var spy = sinon.spy();
 
     folderReader.readFolders('some/test', spy);
