@@ -12,10 +12,11 @@ var assert    = require('assert');
 var sinon     = require('sinon');
 
 var blogdown  = require('../lib/blogdown');
-var reader    = require('../lib/reader');
-var writer    = require('../lib/writer');
-var processor = require('../lib/processor');
-var renderer  = require('../lib/renderer');
+var reader    = require('../lib/item-reader');
+var processor = require('../lib/item-processor');
+var renderer  = require('../lib/html-renderer');
+var writer    = require('../lib/file-writer');
+
 
 test('blogdown', {
 

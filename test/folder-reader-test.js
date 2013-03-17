@@ -11,8 +11,8 @@ var test         = require('utest');
 var assert       = require('assert');
 var sinon        = require('sinon');
 
-var folderReader = require('../lib/folder-reader');
 var fs           = require('fs');
+var folderReader = require('../lib/folder-reader');
 
 
 function testFileNames(suffix) {

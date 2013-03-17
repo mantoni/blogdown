@@ -11,7 +11,7 @@ var test     = require('utest');
 var assert   = require('assert');
 var sinon    = require('sinon');
 
-var renderer = require('../lib/renderer');
+var renderer = require('../lib/html-renderer');
 
 
 var testMeta = { path : 'test' };

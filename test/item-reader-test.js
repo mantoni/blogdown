@@ -11,10 +11,10 @@ var test         = require('utest');
 var assert       = require('assert');
 var sinon        = require('sinon');
 
-var reader       = require('../lib/reader');
 var folderReader = require('../lib/folder-reader');
 var fileReader   = require('../lib/file-reader');
 var itemLinker   = require('../lib/item-linker');
+var reader       = require('../lib/item-reader');
 
 
 test('reader', {
@@ -209,9 +209,9 @@ test('reader', {
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWithMatch(spy, null, {
       items : [sinon.match.has('meta', sinon.match({
-                created  : '1970-01-01T01:00:00+01:00',
-                modified : '1970-01-01T01:00:00+01:00'
-              }))]
+        created  : '1970-01-01T01:00:00+01:00',
+        modified : '1970-01-01T01:00:00+01:00'
+      }))]
     });
   }),
 

@@ -11,8 +11,8 @@ var test       = require('utest');
 var assert     = require('assert');
 var sinon      = require('sinon');
 
-var fileReader = require('../lib/file-reader');
 var fs         = require('fs');
+var fileReader = require('../lib/file-reader');
 
 
 test('file-reader', {

@@ -11,8 +11,8 @@ var test   = require('utest');
 var assert = require('assert');
 var sinon  = require('sinon');
 
-var writer = require('../lib/writer');
 var fs     = require('fs');
+var writer = require('../lib/file-writer');
 
 
 test('writer', {
