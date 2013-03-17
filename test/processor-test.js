@@ -20,7 +20,10 @@ test('processor', {
   before: function () {
     sinon.stub(fs, 'existsSync').returns(false);
     this.item = {
-      timestamp : '2013-02-27T22:16:02+01:00'
+      meta       : {
+        created  : '2013-02-27T22:16:02+01:00',
+        modified : '2013-02-28T23:17:03+01:00'
+      }
     };
   },
 
@@ -28,12 +31,13 @@ test('processor', {
     fs.existsSync.restore();
   },
 
-  'adds date for timestamp using date format': function () {
+  'adds created and modified for timestamps using date format': function () {
     processor.process([this.item], '', {
       dateFormat : 'dddd, MMMM Do YYYY'
     });
 
-    assert.equal(this.item.date, 'Wednesday, February 27th 2013');
+    assert.equal(this.item.date.created, 'Wednesday, February 27th 2013');
+    assert.equal(this.item.date.modified, 'Thursday, February 28th 2013');
   },
 
 

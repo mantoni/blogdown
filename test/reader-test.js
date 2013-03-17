@@ -192,7 +192,7 @@ test('reader', {
   },
 
 
-  'adds timestamp to meta': sinon.test(function () {
+  'adds created and modified timestamps to meta': sinon.test(function () {
     folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['a/b']);
     fileReader.read.yields(null, {
@@ -208,8 +208,10 @@ test('reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWithMatch(spy, null, {
-      items : [sinon.match.has('meta',
-                sinon.match.has('timestamp', '1970-01-01T01:00:00+01:00'))]
+      items : [sinon.match.has('meta', sinon.match({
+                created  : '1970-01-01T01:00:00+01:00',
+                modified : '1970-01-01T01:00:00+01:00'
+              }))]
     });
   }),
 
