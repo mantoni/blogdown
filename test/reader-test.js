@@ -136,6 +136,34 @@ test('reader', {
   },
 
 
+  'does not add folder items if no data': function () {
+    folderReader.readFolders.yields(null, ['folder']);
+    folderReader.readFiles.yields(null, ['some.json']);
+    var spy = sinon.spy();
+
+    reader.read('x', spy);
+    fileReader.read.firstCall.invokeCallback(null, {
+      path     : 'x/test',
+      fileName : 'test',
+      html     : '<i>hi</i>',
+      some     : 'data'
+    });
+    fileReader.read.secondCall.invokeCallback(null, {
+      path     : 'x/folder/name',
+      fileName : 'name',
+      html     : '<i>there</i>'
+    });
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      items : [sinon.match.any]
+    });
+    sinon.assert.neverCalledWithMatch(spy, null, {
+      items : [sinon.match.has('folder')]
+    });
+  },
+
+
   'adds timestamp to result': sinon.test(function () {
     folderReader.readFolders.yields(null, []);
     folderReader.readFiles.yields(null, ['a/b']);
