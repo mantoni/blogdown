@@ -1,8 +1,8 @@
 ## Workflow
 
  - Scan source dir
- - Read .html / mustache, .json and .md files
- - Create partials object with html snippets and items array with json and markdown
+ - Read .html / .mustache, .md and .json files
+ - Create partials object with html and items array with json and markdown
  - Scan "meta" dir
  - Read .json files and put existing timestamp in source items
  - Add timestamps to new items
@@ -23,24 +23,12 @@
 
   // Links to other items:
   link : {
-    // Previous / next item in same folder, or null if first / last:
-    previous : { ... },
-    next     : { ... },
-
-    // Hash where key is the name of a sub folder:
-    'a-folder' : {
-      // Hash where key is the fileName of a file:
-      map : {
-        'a-file' : { ... },
-        ...
-      },
-
-      // Array of above items, ordered by creation:
-      list : [{ ... }, ...]
-    }
+    previous : { ... }, // previous item in same folder
+    next     : { ... }
   },
 
-  // Arbitrary data:
-  'any-property' : 'defined in a .json file'
+  html : '<html/>',
+  md   : '<p>parsed from markdown</p>'
+  any  : 'property defined in a .json file'
 }
 ```

@@ -19,19 +19,17 @@ test('writer', {
 
   before: function () {
     sinon.stub(fs, 'writeFile');
-    sinon.stub(fs, 'mkdir');
-    sinon.stub(fs, 'exists');
+    sinon.stub(fs, 'mkdirSync');
+    sinon.stub(fs, 'existsSync');
   },
 
   after: function () {
     fs.writeFile.restore();
-    fs.mkdir.restore();
-    fs.exists.restore();
+    fs.mkdirSync.restore();
+    fs.existsSync.restore();
   },
 
   'writes the given items to files': function () {
-    fs.exists.yields(false);
-
     writer.write([{
       path : 'file1.html',
       data : '<h1>foo</h1>'
@@ -47,7 +45,6 @@ test('writer', {
 
 
   'yields once all files where written': function () {
-    fs.exists.yields(false);
     var spy = sinon.spy();
 
     writer.write([{
@@ -70,26 +67,36 @@ test('writer', {
   },
 
   'creates directory for path before writing file': function () {
-    fs.exists.yields(false);
     writer.write([{
       path : 'folder/file.json',
       data : ''
     }], 'target', function () {});
 
-    sinon.assert.notCalled(fs.writeFile);
-    sinon.assert.calledOnce(fs.mkdir);
-    sinon.assert.calledWith(fs.mkdir, 'target/folder');
-
-    fs.mkdir.invokeCallback();
-
+    sinon.assert.calledWith(fs.mkdirSync, 'target');
+    sinon.assert.calledWith(fs.mkdirSync, 'target/folder');
     sinon.assert.calledOnce(fs.writeFile);
+    sinon.assert.callOrder(fs.mkdirSync, fs.writeFile);
   },
 
-  'errs and does not create file if mkdir fails': function () {
-    fs.exists.yields(false);
+  'errs and does not create file if mkdir for root fails': function () {
     var spy = sinon.spy();
     var err = new Error();
-    fs.mkdir.yields(err);
+    fs.mkdirSync.withArgs('site').throws(err);
+
+    writer.write([{
+      path : 'folder/file.json',
+      data : ''
+    }], 'site', spy);
+
+    sinon.assert.notCalled(fs.writeFile);
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, err);
+  },
+
+  'errs and does not create file if mkdir for folder fails': function () {
+    var spy = sinon.spy();
+    var err = new Error();
+    fs.mkdirSync.withArgs('./folder').throws(err);
 
     writer.write([{
       path : 'folder/file.json',
@@ -102,16 +109,17 @@ test('writer', {
   },
 
   'does not mkdir if folder already exists': function () {
-    fs.exists.yields(true);
+    fs.existsSync.returns(true);
 
     writer.write([{
       path : 'folder/file.json',
       data : ''
     }], 'target', function () {});
 
-    sinon.assert.calledOnce(fs.exists);
-    sinon.assert.calledWith(fs.exists, 'target/folder');
-    sinon.assert.notCalled(fs.mkdir);
+    sinon.assert.calledTwice(fs.existsSync);
+    sinon.assert.calledWith(fs.existsSync, 'target');
+    sinon.assert.calledWith(fs.existsSync, 'target/folder');
+    sinon.assert.notCalled(fs.mkdirSync);
     sinon.assert.calledOnce(fs.writeFile);
   }
 

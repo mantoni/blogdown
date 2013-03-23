@@ -37,10 +37,9 @@ test('renderer', {
   'returns array with objects of path and html': function () {
     var result = renderer.render([{
       meta : testMeta,
-      md   : '<p>from markdown</p>'
-    }], {
-      test : '<div>{{{md}}}</div>'
-    });
+      md   : '<p>from markdown</p>',
+      html : '<div>{{{md}}}</div>'
+    }], {});
 
     assert.deepEqual(result, [{
       path : 'test.html',
@@ -52,9 +51,9 @@ test('renderer', {
   'passes partials to mustache': function () {
     var result = renderer.render([{
       meta : testMeta,
-      some : 'stuff'
+      some : 'stuff',
+      html : '<div>{{>heading}}</div>'
     }], {
-      test    : '<div>{{>heading}}</div>',
       heading : '<h1>{{some}}</h1>'
     });
 
@@ -65,30 +64,18 @@ test('renderer', {
   },
 
 
-  'does not create file object if path is not a partial': function () {
+  'does not create file object if html is missing': function () {
     var result = renderer.render([{ meta : { path : 'unknown' } }], {});
 
     assert.deepEqual(result, []);
   },
 
 
-  'logs a warning if path is not a partial': function () {
+  'logs a warning if html is missing': function () {
     renderer.render([{ meta : { path : 'unknown' } }], {});
 
     sinon.assert.calledOnce(console.warn);
     sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown');
-  },
-
-  'replaces slash in path with dot to lookup partial': function () {
-    var result = renderer.render([{ meta : { path : 'some/file' } }], {
-      'some.file' : '<em>Yeah!</em>'
-    });
-
-    sinon.assert.notCalled(console.warn);
-    assert.deepEqual(result, [{
-      path : 'some/file.html',
-      data : '<em>Yeah!</em>'
-    }]);
   }
 
 });

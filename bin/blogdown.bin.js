@@ -16,28 +16,26 @@ fileReader.read('options', function (err, options) {
     process.stderr.write('\n');
     return;
   }
+  var time = Date.now();
   delete options.fileName;
   if (!Object.keys(options).length) {
-    process.stdout.write('No options found\n');
+    console.error('No options found');
   }
 
   blogdown('src', 'site', options, function (err) {
     if (err) {
       if (err.errors) {
-        process.stderr.write(err.toString());
-        process.stderr.write('\n');
+        console.error(err.toString());
         err.errors.forEach(function (error) {
-          process.stderr.write('\n');
-          process.stderr.write(error.stack);
-          process.stderr.write('\n');
+          if (error.stack.split('\n').length > 1) {
+            console.error(error.stack);
+          }
         });
       } else {
-        process.stderr.write('\n');
-        process.stderr.write(err.stack);
-        process.stderr.write('\n');
+        console.error(err.stack);
       }
     } else {
-      process.stdout.write('DONE\n');
+      console.log('DONE - %s ms', Date.now() - time);
     }
   });
 

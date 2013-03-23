@@ -12,7 +12,7 @@ var assert    = require('assert');
 var sinon     = require('sinon');
 
 var blogdown  = require('../lib/blogdown');
-var reader    = require('../lib/item-reader');
+var reader    = require('../lib/reader');
 var processor = require('../lib/item-processor');
 var renderer  = require('../lib/html-renderer');
 var writer    = require('../lib/file-writer');
@@ -40,7 +40,7 @@ test('blogdown', {
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(reader.read);
-    sinon.assert.calledWith(reader.read, 'some/source');
+    sinon.assert.calledWith(reader.read, 'some/source', {});
   },
 
 
@@ -69,22 +69,26 @@ test('blogdown', {
 
 
   'writes renderer return value': function () {
-    reader.read.yields(null, {});
-    var files = [{ fileName : 'foo', html : '...' }];
+    reader.read.yields(null, { items : [] });
+    var files = [{ path : 'source/foo', html : '...' }];
     renderer.render.returns(files);
 
-    blogdown('some/source', 'some/target', this.options, function () {});
+    blogdown('source', 'target', this.options, function () {});
 
     sinon.assert.calledOnce(writer.write);
-    sinon.assert.calledWith(writer.write, files, 'some/target');
+    sinon.assert.calledWith(writer.write, [{
+      path : 'foo',
+      html : '...'
+    }], 'target');
   },
 
 
   'yields once writer yields': function () {
-    reader.read.yields(null, {});
+    reader.read.yields(null, { items : [] });
+    renderer.render.returns([]);
     var spy = sinon.spy();
 
-    blogdown('some/source', 'some/target', this.options, spy);
+    blogdown('source', 'target', this.options, spy);
 
     sinon.assert.notCalled(spy);
 
@@ -97,6 +101,7 @@ test('blogdown', {
   'yields error and does not continue if reader errs': function () {
     var err = new Error('ouch');
     reader.read.yields(err);
+    renderer.render.returns([]);
     var spy = sinon.spy();
 
     blogdown('some/source', 'some/target', this.options, spy);
@@ -114,6 +119,7 @@ test('blogdown', {
     var spy = sinon.spy();
     processor.process.throws(err);
     reader.read.yields(null, {});
+    renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
 
@@ -127,6 +133,7 @@ test('blogdown', {
     var spy = sinon.spy();
     renderer.render.throws(err);
     reader.read.yields(null, {});
+    renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
 
