@@ -27,23 +27,20 @@ test('processor', {
     fs.existsSync.restore();
   },
 
-  'adds created and modified for timestamps using date format': sinon.test(
-    function () {
+  'adds created and modified for timestamps using multiple formats':
+    sinon.test(function () {
       processor.process([this.item], '', {
-        dateFormat : 'dddd, MMMM Do YYYY'
+        dateFormats : {
+          fullDate  : 'MMMM Do YYYY',
+          someTime  : 'HH:mm:ss'
+        }
       });
 
-      assert.equal(this.item.date.created, 'Thursday, January 1st 1970');
-      assert.equal(this.item.date.modified, 'Thursday, January 1st 1970');
-    }
-  ),
-
-
-  'does not add date if not configured': function () {
-    processor.process([this.item], '', {});
-
-    assert.strictEqual(this.item.date, undefined);
-  },
+      assert.equal(this.item.fullDate.created, 'January 1st 1970');
+      assert.equal(this.item.fullDate.modified, 'January 1st 1970');
+      assert.equal(this.item.someTime.created, '01:00:00');
+      assert.equal(this.item.someTime.modified, '01:00:00');
+    }),
 
 
   'checks for processor.js in given path': function () {
