@@ -28,20 +28,20 @@ test('renderer', {
   },
 
   'returns empty array': function () {
-    var result = renderer.render([], {});
+    var results = renderer.render([], {});
 
-    assert.deepEqual(result, []);
+    assert.deepEqual(results, []);
   },
 
 
   'returns array with objects of path and html': function () {
-    var result = renderer.render([{
+    var results = renderer.render([{
       meta : testMeta,
       md   : '<p>from markdown</p>',
       html : '<div>{{{md}}}</div>'
     }], {});
 
-    assert.deepEqual(result, [{
+    assert.deepEqual(results, [{
       path : 'test.html',
       data : '<div><p>from markdown</p></div>'
     }]);
@@ -49,7 +49,7 @@ test('renderer', {
 
 
   'passes partials to mustache': function () {
-    var result = renderer.render([{
+    var results = renderer.render([{
       meta : testMeta,
       some : 'stuff',
       html : '<div>{{>heading}}</div>'
@@ -57,7 +57,7 @@ test('renderer', {
       heading : '<h1>{{some}}</h1>'
     });
 
-    assert.deepEqual(result, [{
+    assert.deepEqual(results, [{
       path : 'test.html',
       data : '<div><h1>stuff</h1></div>'
     }]);
@@ -65,14 +65,14 @@ test('renderer', {
 
 
   'does not create file object if html is missing': function () {
-    var result = renderer.render([{ meta : { path : 'unknown' } }], {});
+    var results = renderer.render([{ meta : { path : 'unknown' } }]);
 
-    assert.deepEqual(result, []);
+    assert.deepEqual(results, []);
   },
 
 
   'logs a warning if html is missing': function () {
-    renderer.render([{ meta : { path : 'unknown' } }], {});
+    renderer.render([{ meta : { path : 'unknown' } }]);
 
     sinon.assert.calledOnce(console.warn);
     sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown');

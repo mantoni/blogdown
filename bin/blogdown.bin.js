@@ -16,13 +16,13 @@ fileReader.read('options', function (err, options) {
     process.stderr.write('\n');
     return;
   }
-  var time = Date.now();
-  delete options.fileName;
+  delete options.meta;
   if (!Object.keys(options).length) {
-    console.error('No options found');
+    console.warn('No options found');
   }
 
-  blogdown('src', 'site', options, function (err) {
+  var time = Date.now();
+  blogdown('src', 'site', options, function (err, stats) {
     if (err) {
       if (err.errors) {
         console.error(err.toString());
@@ -35,7 +35,11 @@ fileReader.read('options', function (err, options) {
         console.error(err.stack);
       }
     } else {
-      console.log('DONE - %s ms', Date.now() - time);
+      var line = new Array(70).join('-');
+      console.info(line);
+      console.info('Processed %d files in %d ms', stats.files,
+        Date.now() - time);
+      console.info(line);
     }
   });
 

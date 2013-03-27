@@ -108,8 +108,7 @@ test('template-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
-      html     : '<html/>',
-      json     : { v : 42 },
+      json     : { html : '<html/>', v : 42 },
       partials : {}
     });
   },
@@ -156,9 +155,8 @@ test('template-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
-      html     : '<html/>',
       partials : { t1 : '<i>t</i>' },
-      json     : { the : 'template', v : 42 }
+      json     : { html : '<html/>', the : 'template', v : 42 }
     });
   },
 
@@ -181,9 +179,8 @@ test('template-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, {
-      html     : '<html/>',
       partials : { x : '<p/>' },
-      json     : { v1 : 1, x : { v2 : 2 } }
+      json     : { html : '<html/>', v1 : 1, x : { v2 : 2 } }
     });
   },
 

@@ -69,25 +69,6 @@ test('processor', {
 
     assert.equal(this.item.meta.created, '1970-01-01T01:00:00+01:00');
     assert.equal(this.item.meta.modified, '1970-01-01T01:00:00+01:00');
-  }),
-
-
-  'adds link object to results': function () {
-    processor.process([this.item], '', {});
-
-    assert.deepEqual(this.item.link, { previous : null, next : null });
-  },
-
-
-  'passes items to itemLinker.previousNext': sinon.test(function () {
-    this.stub(itemLinker, 'previousNext');
-    var firstItem  = { meta : {} };
-    var secondItem = { meta : { } };
-
-    processor.process([firstItem, secondItem], '', {});
-
-    sinon.assert.calledOnce(itemLinker.previousNext);
-    sinon.assert.calledWith(itemLinker.previousNext, [firstItem, secondItem]);
   })
 
 });

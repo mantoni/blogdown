@@ -17,6 +17,7 @@ var templateReader = require('../lib/template-reader');
 var itemReader     = require('../lib/item-reader');
 var folderReader   = require('../lib/folder-reader');
 var fileReader     = require('../lib/file-reader');
+var itemLinker     = require('../lib/item-linker');
 
 
 test('reader', {
@@ -125,7 +126,8 @@ test('reader', {
 
       sinon.assert.calledOnce(spy);
       sinon.assert.calledWith(spy, null, {
-        items : [{ p1 : 1 }, { p2 : 2 }, { p3 : 3 }]
+        items : [sinon.match.has('p1', 1), sinon.match.has('p2', 2),
+          sinon.match.has('p3', 3)]
       });
     },
 
@@ -157,7 +159,7 @@ test('reader', {
   'merges template result into items': sinon.test(function () {
     this.stub(merger, 'apply');
     var items    = [{}, { v : 42 }];
-    var template = { html : '<html/>', json : { some : 'data' } };
+    var template = { json : { html : '<html/>', some : 'data' } };
     templateReader.read.yields(null, template);
     itemReader.read.yields(null, items);
     folderReader.readFolders.yields(null, []);
@@ -165,19 +167,14 @@ test('reader', {
     reader.read('x', {}, function () {});
 
     sinon.assert.calledOnce(merger.apply);
-    sinon.assert.calledWith(merger.apply, [{
-      html : '<html/>'
-    }, {
-      html : '<html/>',
-      v : 42
-    }], template.json);
+    sinon.assert.calledWith(merger.apply, items, template.json);
   }),
 
 
   'does not replace existing html': sinon.test(function () {
     this.stub(merger, 'apply');
     var items    = [{ html : '<blockquote/>' }];
-    var template = { html : '<html/>', json : {} };
+    var template = { json : { html : '<html/>' } };
     templateReader.read.yields(null, template);
     itemReader.read.yields(null, items);
     folderReader.readFolders.yields(null, []);
@@ -185,9 +182,79 @@ test('reader', {
     reader.read('x', {}, function () {});
 
     sinon.assert.calledOnce(merger.apply);
-    sinon.assert.calledWith(merger.apply, [{
-      html : '<blockquote/>'
-    }], template.json);
+    sinon.assert.calledWith(merger.apply,
+      [sinon.match.has('html', '<blockquote/>')], template.json);
+  }),
+
+
+  'adds link object to results': function () {
+    templateReader.read.yields(null, {});
+    itemReader.read.yields(null, [{}]);
+    folderReader.readFolders.yields(null, []);
+    var spy = sinon.spy();
+
+    reader.read('x', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, {
+      items : [{ link : sinon.match.object }]
+    });
+  },
+
+
+  'passes items to itemLinker.previousNext': sinon.test(function () {
+    this.stub(itemLinker, 'previousNext');
+    templateReader.read.yields(null, {});
+    var firstItem  = {};
+    var secondItem = {};
+    itemReader.read.yields(null, [firstItem, secondItem]);
+
+    reader.read('x', {}, function () {});
+
+    sinon.assert.calledOnce(itemLinker.previousNext);
+    sinon.assert.calledWith(itemLinker.previousNext, [firstItem, secondItem]);
+  }),
+
+
+  'passes items to itemLinker.sibling': sinon.test(function () {
+    this.stub(itemLinker, 'sibling');
+    templateReader.read.yields(null, {});
+    var firstItem  = {};
+    var secondItem = {};
+    itemReader.read.yields(null, [firstItem, secondItem]);
+
+    reader.read('x', {}, function () {});
+
+    sinon.assert.calledOnce(itemLinker.sibling);
+    sinon.assert.calledWith(itemLinker.sibling, [firstItem, secondItem]);
+  }),
+
+
+  'passes items to itemLinker.parentChild': sinon.test(function () {
+    this.spy(reader, 'read');
+    this.stub(itemLinker, 'parentChild');
+    templateReader.read.yields(null, {});
+    var firstParentItem  = {};
+    var secondParentItem = {};
+    var firstChildItem   = {};
+    var secondChildItem  = {};
+    var thirdChildItem   = {};
+
+    reader.read('x', {}, function () {});
+    itemReader.read.invokeCallback(null, [firstParentItem, secondParentItem]);
+    folderReader.readFolders.invokeCallback(null, ['a', 'b']);
+    reader.read.secondCall.invokeCallback(null, {
+      items : [firstChildItem, secondChildItem]
+    });
+    reader.read.thirdCall.invokeCallback(null, {
+      items : [thirdChildItem]
+    });
+
+    sinon.assert.calledTwice(itemLinker.parentChild);
+    sinon.assert.calledWith(itemLinker.parentChild,
+      [firstParentItem, secondParentItem], [firstChildItem, secondChildItem]);
+    sinon.assert.calledWith(itemLinker.parentChild,
+      [firstParentItem, secondParentItem], [thirdChildItem]);
   })
 
 });

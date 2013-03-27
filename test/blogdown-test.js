@@ -45,39 +45,53 @@ test('blogdown', {
 
 
   'processes items from reader yield with options': function () {
-    var data = { items : [{ some : 'item' }], partials : {} };
-    reader.read.yields(null, data);
+    var item = { meta : { path : 'some/source/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [item], partials : {} });
 
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(processor.process);
-    sinon.assert.calledWith(processor.process, [{ some : 'item' }],
+    sinon.assert.calledWith(processor.process, [item],
         'some/source', this.options);
   },
 
 
   'renders items after processing': function () {
-    var data = { items : [{ some : 'item' }], partials : {} };
-    reader.read.yields(null, data);
+    var item = { meta : { path : 'some/source/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
 
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(renderer.render);
-    sinon.assert.calledWith(renderer.render, data.items, data.partials);
+    sinon.assert.calledWith(renderer.render, [item], { p : '<p/>' });
     sinon.assert.callOrder(processor.process, renderer.render);
+  },
+
+
+  'removes source directory from path': function () {
+    var foo = { meta : { path : 'source/the/foo' } };
+    var bar = { meta : { path : 'source/the/bar' } };
+    reader.read.yields(null, {
+      items : [foo, bar]
+    });
+
+    blogdown('source', 'target', this.options, function () {});
+
+    assert.equal(foo.meta.path, 'the/foo');
+    assert.equal(bar.meta.path, 'the/bar');
   },
 
 
   'writes renderer return value': function () {
     reader.read.yields(null, { items : [] });
-    var files = [{ path : 'source/foo', html : '...' }];
+    var files = [{ path : 'the/foo', html : '...' }];
     renderer.render.returns(files);
 
     blogdown('source', 'target', this.options, function () {});
 
     sinon.assert.calledOnce(writer.write);
     sinon.assert.calledWith(writer.write, [{
-      path : 'foo',
+      path : 'the/foo',
       html : '...'
     }], 'target');
   },
@@ -118,7 +132,7 @@ test('blogdown', {
     var err = new Error('ouch');
     var spy = sinon.spy();
     processor.process.throws(err);
-    reader.read.yields(null, {});
+    reader.read.yields(null, { items : [] });
     renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
@@ -132,7 +146,7 @@ test('blogdown', {
     var err = new Error('ouch');
     var spy = sinon.spy();
     renderer.render.throws(err);
-    reader.read.yields(null, {});
+    reader.read.yields(null, { items : [] });
     renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
