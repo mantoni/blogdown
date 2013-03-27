@@ -9,10 +9,6 @@ lint:
 test:
 	@node -e "require('urun')('test', { include: /\-test\.js$$/ });"
 
-compile: lint test
-	@nomo
-	@node_modules/.bin/uglifyjs hub.js > hub.min.js
-
 version := $(shell node -e "console.log(require('./package.json').version)")
 
 release:
