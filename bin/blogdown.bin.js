@@ -6,19 +6,14 @@
  *
  * @license MIT
  */
-var blogdown   = require('../lib/blogdown');
-var fileReader = require('../lib/file-reader');
+var options  = require('../lib/options');
+var blogdown = require('../lib/blogdown');
 
 
-fileReader.read('options', function (err, options) {
+options.read('blogdown', function (err, options) {
   if (err) {
-    process.stderr.write(err.toString());
-    process.stderr.write('\n');
+    console.error(err);
     return;
-  }
-  delete options.meta;
-  if (!Object.keys(options).length) {
-    console.warn('No options found');
   }
 
   var time = Date.now();
