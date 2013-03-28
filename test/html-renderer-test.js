@@ -72,10 +72,10 @@ test('renderer', {
 
 
   'logs a warning if html is missing': function () {
-    renderer.render([{ meta : { path : 'unknown' } }]);
+    renderer.render([{ meta : { path : 'unknown/foo', fileName : 'foo' } }]);
 
     sinon.assert.calledOnce(console.warn);
-    sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown');
+    sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown/foo');
   }
 
 });

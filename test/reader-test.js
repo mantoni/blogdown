@@ -127,8 +127,8 @@ test('reader', {
       sinon.assert.calledOnce(spy);
       var items = spy.firstCall.args[1].items;
       assert.equal(items[0].p1, 1);
-      assert.equal(items[1].link.child[0].p2, 2);
-      assert.equal(items[2].link.child[0].p3, 3);
+      assert.equal(items[1].child[0].p2, 2);
+      assert.equal(items[2].child[0].p3, 3);
     },
 
 
@@ -187,21 +187,6 @@ test('reader', {
   }),
 
 
-  'adds link object to results': function () {
-    templateReader.read.yields(null, {});
-    itemReader.read.yields(null, [{}]);
-    folderReader.readFolders.yields(null, []);
-    var spy = sinon.spy();
-
-    reader.read('x', {}, spy);
-
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, {
-      items : [{ link : sinon.match.object }]
-    });
-  },
-
-
   'passes items to itemLinker.previousNext': sinon.test(function () {
     this.stub(itemLinker, 'previousNext');
     templateReader.read.yields(null, {});
@@ -250,8 +235,8 @@ test('reader', {
       items : [thirdChildItem]
     });
 
-    var virtualItemA = { meta : { dirName : 'a', path : 'x/a' }, link : {} };
-    var virtualItemB = { meta : { dirName : 'b', path : 'x/b' }, link : {} };
+    var virtualItemA = { meta : { dirName : 'a', path : 'x/a' } };
+    var virtualItemB = { meta : { dirName : 'b', path : 'x/b' } };
     sinon.assert.calledThrice(itemLinker.parentChild);
     sinon.assert.calledWith(itemLinker.parentChild,
         [virtualItemA], [firstChildItem, secondChildItem]);
