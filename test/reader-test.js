@@ -125,10 +125,10 @@ test('reader', {
       folderReader.readFolders.thirdCall.invokeCallback(null, []);
 
       sinon.assert.calledOnce(spy);
-      sinon.assert.calledWith(spy, null, {
-        items : [sinon.match.has('p1', 1), sinon.match.has('p2', 2),
-          sinon.match.has('p3', 3)]
-      });
+      var items = spy.firstCall.args[1].items;
+      assert.equal(items[0].p1, 1);
+      assert.equal(items[1].link.child[0].p2, 2);
+      assert.equal(items[2].link.child[0].p3, 3);
     },
 
 
@@ -234,11 +234,11 @@ test('reader', {
     this.spy(reader, 'read');
     this.stub(itemLinker, 'parentChild');
     templateReader.read.yields(null, {});
-    var firstParentItem  = {};
-    var secondParentItem = {};
-    var firstChildItem   = {};
-    var secondChildItem  = {};
-    var thirdChildItem   = {};
+    var firstParentItem  = { meta : { fileName : 'p1' } };
+    var secondParentItem = { meta : { fileName : 'p2' } };
+    var firstChildItem   = { meta : { fileName : 'c1' } };
+    var secondChildItem  = { meta : { fileName : 'c2' } };
+    var thirdChildItem   = { meta : { fileName : 'c3' } };
 
     reader.read('x', {}, function () {});
     itemReader.read.invokeCallback(null, [firstParentItem, secondParentItem]);
@@ -250,11 +250,15 @@ test('reader', {
       items : [thirdChildItem]
     });
 
-    sinon.assert.calledTwice(itemLinker.parentChild);
+    var virtualItemA = { meta : { dirName : 'a', path : 'x/a' }, link : {} };
+    var virtualItemB = { meta : { dirName : 'b', path : 'x/b' }, link : {} };
+    sinon.assert.calledThrice(itemLinker.parentChild);
     sinon.assert.calledWith(itemLinker.parentChild,
-      [firstParentItem, secondParentItem], [firstChildItem, secondChildItem]);
+        [virtualItemA], [firstChildItem, secondChildItem]);
     sinon.assert.calledWith(itemLinker.parentChild,
-      [firstParentItem, secondParentItem], [thirdChildItem]);
+        [virtualItemB], [thirdChildItem]);
+    sinon.assert.calledWith(itemLinker.parentChild,
+        [firstParentItem, secondParentItem], [virtualItemA, virtualItemB]);
   })
 
 });
