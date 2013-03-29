@@ -11,7 +11,7 @@ Generate HTML with Mustache and Markdown
 
 ## Current Status
 
-Heavy development. Thinks will likely change a lot.
+Heavy development. Things will likely change a lot.
 Feedback, issues and pull requests welcome.
 
 ## Install
@@ -56,15 +56,15 @@ The internal model of each item that is passed to Mustache looks like this:
   },
 
   // Links to other items:
-  link : {
-    previous : { ... }, // previous item in same folder
-    next     : { ... },
-    sibling  : [ ... ], // array, but also accessible by fileName
-    child    : [ ... ]
-  },
+  previous : { ... }, // previous item in same folder
+  next     : { ... },
+  sibling  : [ ... ], // array, but also accessible by fileName
+  child    : [ ... ], //           -- " --
+  parent   : [ ... ], //           -- " --
 
   html : '<html/>',
-  md   : '<p>parsed from markdown</p>'
+  md   : '<p>parsed from markdown</p>',
+
   any  : 'property defined in a .json file'
 }
 ```
