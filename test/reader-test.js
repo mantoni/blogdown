@@ -125,10 +125,10 @@ test('reader', {
       folderReader.readFolders.thirdCall.invokeCallback(null, []);
 
       sinon.assert.calledOnce(spy);
-      var items = spy.firstCall.args[1].items;
-      assert.equal(items[0].p1, 1);
-      assert.equal(items[1].child[0].p2, 2);
-      assert.equal(items[2].child[0].p3, 3);
+      sinon.assert.calledWith(spy, null, {
+        items : [sinon.match({ p1 : 1 }),
+          sinon.match({ p2 : 2 }), sinon.match({ p3 : 3 })]
+      });
     },
 
 
@@ -198,52 +198,6 @@ test('reader', {
 
     sinon.assert.calledOnce(itemLinker.previousNext);
     sinon.assert.calledWith(itemLinker.previousNext, [firstItem, secondItem]);
-  }),
-
-
-  'passes items to itemLinker.sibling': sinon.test(function () {
-    this.stub(itemLinker, 'sibling');
-    templateReader.read.yields(null, {});
-    var firstItem  = {};
-    var secondItem = {};
-    itemReader.read.yields(null, [firstItem, secondItem]);
-
-    reader.read('x', {}, function () {});
-
-    sinon.assert.calledOnce(itemLinker.sibling);
-    sinon.assert.calledWith(itemLinker.sibling, [firstItem, secondItem]);
-  }),
-
-
-  'passes items to itemLinker.parentChild': sinon.test(function () {
-    this.spy(reader, 'read');
-    this.stub(itemLinker, 'parentChild');
-    templateReader.read.yields(null, {});
-    var firstParentItem  = { file : { name : 'p1' } };
-    var secondParentItem = { file : { name : 'p2' } };
-    var firstChildItem   = { file : { name : 'c1' } };
-    var secondChildItem  = { file : { name : 'c2' } };
-    var thirdChildItem   = { file : { name : 'c3' } };
-
-    reader.read('x', {}, function () {});
-    itemReader.read.invokeCallback(null, [firstParentItem, secondParentItem]);
-    folderReader.readFolders.invokeCallback(null, ['a', 'b']);
-    reader.read.secondCall.invokeCallback(null, {
-      items : [firstChildItem, secondChildItem]
-    });
-    reader.read.thirdCall.invokeCallback(null, {
-      items : [thirdChildItem]
-    });
-
-    var virtualItemA = { file : { dirName : 'a', path : 'x/a' } };
-    var virtualItemB = { file : { dirName : 'b', path : 'x/b' } };
-    sinon.assert.calledThrice(itemLinker.parentChild);
-    sinon.assert.calledWith(itemLinker.parentChild,
-        [virtualItemA], [firstChildItem, secondChildItem]);
-    sinon.assert.calledWith(itemLinker.parentChild,
-        [virtualItemB], [thirdChildItem]);
-    sinon.assert.calledWith(itemLinker.parentChild,
-        [firstParentItem, secondParentItem], [virtualItemA, virtualItemB]);
   })
 
 });
