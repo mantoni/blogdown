@@ -140,7 +140,7 @@ test('file-reader', {
   },
 
 
-  'adds fileName and path to meta object': function () {
+  'adds name and path to file object': function () {
     fs.exists.withArgs('some/test.json').yields(true);
     fs.readFile.withArgs('some/test.json').yields(null, new Buffer('{}'));
     var spy = sinon.spy();
@@ -149,9 +149,9 @@ test('file-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWithMatch(spy, null, {
-      meta       : {
-        fileName : 'test',
-        path     : 'some/test'
+      file   : {
+        name : 'test',
+        path : 'some/test'
       }
     });
   }

@@ -45,7 +45,7 @@ test('blogdown', {
 
 
   'processes items from reader yield with options': function () {
-    var item = { meta : { path : 'some/source/foo' }, some : 'item' };
+    var item = { file : { path : 'some/source/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : {} });
 
     blogdown('some/source', 'some/target', this.options, function () {});
@@ -57,7 +57,7 @@ test('blogdown', {
 
 
   'renders items after processing': function () {
-    var item = { meta : { path : 'some/source/foo' }, some : 'item' };
+    var item = { file : { path : 'some/source/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
 
     blogdown('some/source', 'some/target', this.options, function () {});
@@ -69,16 +69,16 @@ test('blogdown', {
 
 
   'removes source directory from path': function () {
-    var foo = { meta : { path : 'source/the/foo' } };
-    var bar = { meta : { path : 'source/the/bar' } };
+    var foo = { file : { path : 'source/the/foo' } };
+    var bar = { file : { path : 'source/the/bar' } };
     reader.read.yields(null, {
       items : [foo, bar]
     });
 
     blogdown('source', 'target', this.options, function () {});
 
-    assert.equal(foo.meta.path, 'the/foo');
-    assert.equal(bar.meta.path, 'the/bar');
+    assert.equal(foo.file.path, 'the/foo');
+    assert.equal(bar.file.path, 'the/bar');
   },
 
 

@@ -51,11 +51,11 @@ test('reader', {
   'returns items from read results': function () {
     folderReader.readFiles.yields(null, ['any']);
     var item = {
-      meta       : {
-        path     : 'x/test',
-        fileName : 'test'
+      file   : {
+        path : 'x/test',
+        name : 'test'
       },
-      html       : '<i>hi</i>'
+      html   : '<i>hi</i>'
     };
     fileReader.read.yields(null, item);
     var spy = sinon.spy();

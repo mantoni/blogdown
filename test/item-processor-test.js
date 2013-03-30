@@ -20,7 +20,7 @@ test('processor', {
 
   before: function () {
     sinon.stub(fs, 'existsSync').returns(false);
-    this.item = { meta : {} };
+    this.item = { file : {} };
   },
 
   after: function () {
@@ -61,11 +61,11 @@ test('processor', {
   },
 
 
-  'adds created and modified timestamps to meta': sinon.test(function () {
+  'adds created and modified timestamps to file': sinon.test(function () {
     processor.process([this.item], '', {});
 
-    assert.equal(this.item.meta.created, '1970-01-01T01:00:00+01:00');
-    assert.equal(this.item.meta.modified, '1970-01-01T01:00:00+01:00');
+    assert.equal(this.item.file.created, '1970-01-01T01:00:00+01:00');
+    assert.equal(this.item.file.modified, '1970-01-01T01:00:00+01:00');
   })
 
 });

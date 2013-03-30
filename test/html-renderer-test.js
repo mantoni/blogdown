@@ -14,7 +14,7 @@ var sinon    = require('sinon');
 var renderer = require('../lib/html-renderer');
 
 
-var testMeta = { path : 'test' };
+var testFile = { path : 'test' };
 
 
 test('renderer', {
@@ -36,7 +36,7 @@ test('renderer', {
 
   'returns array with objects of path and html': function () {
     var results = renderer.render([{
-      meta : testMeta,
+      file : testFile,
       md   : '<p>from markdown</p>',
       html : '<div>{{{md}}}</div>'
     }], {});
@@ -50,7 +50,7 @@ test('renderer', {
 
   'passes partials to mustache': function () {
     var results = renderer.render([{
-      meta : testMeta,
+      file : testFile,
       some : 'stuff',
       html : '<div>{{>heading}}</div>'
     }], {
@@ -65,14 +65,14 @@ test('renderer', {
 
 
   'does not create file object if html is missing': function () {
-    var results = renderer.render([{ meta : { path : 'unknown' } }]);
+    var results = renderer.render([{ file : { path : 'unknown' } }]);
 
     assert.deepEqual(results, []);
   },
 
 
   'logs a warning if html is missing': function () {
-    renderer.render([{ meta : { path : 'unknown/foo', fileName : 'foo' } }]);
+    renderer.render([{ file : { path : 'unknown/foo', name : 'foo' } }]);
 
     sinon.assert.calledOnce(console.warn);
     sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown/foo');

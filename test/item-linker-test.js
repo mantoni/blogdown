@@ -54,9 +54,9 @@ function typeOf(object) {
 test('item-linker sibling', {
 
   'creates sibling array on each item': function () {
-    var first  = { meta : { fileName : 'a' } };
-    var second = { meta : { fileName : 'b' } };
-    var third  = { meta : { fileName : 'c' } };
+    var first  = { file : { name : 'a' } };
+    var second = { file : { name : 'b' } };
+    var third  = { file : { name : 'c' } };
 
     itemLinker.sibling([first, second, third]);
 
@@ -67,9 +67,9 @@ test('item-linker sibling', {
 
 
   'links sibling with each other by index': function () {
-    var first  = { meta : { fileName : 'a' } };
-    var second = { meta : { fileName : 'b' } };
-    var third  = { meta : { fileName : 'c' } };
+    var first  = { file : { name : 'a' } };
+    var second = { file : { name : 'b' } };
+    var third  = { file : { name : 'c' } };
 
     itemLinker.sibling([first, second, third]);
 
@@ -85,10 +85,10 @@ test('item-linker sibling', {
   },
 
 
-  'links sibling with each other by fileName': function () {
-    var first  = { meta : { fileName : 'a' } };
-    var second = { meta : { fileName : 'b' } };
-    var third  = { meta : { fileName : 'c' } };
+  'links sibling with each other by name': function () {
+    var first  = { file : { name : 'a' } };
+    var second = { file : { name : 'b' } };
+    var third  = { file : { name : 'c' } };
 
     itemLinker.sibling([first, second, third]);
 
@@ -109,10 +109,10 @@ test('item-linker sibling', {
 test('item-linker parentChild', {
 
   'creates child and  parent arrays on items': function () {
-    var first  = { meta : { fileName : 'a' } };
-    var second = { meta : { fileName : 'b' } };
-    var third  = { meta : { fileName : 'c' } };
-    var fourth = { meta : { fileName : 'd' } };
+    var first  = { file : { name : 'a' } };
+    var second = { file : { name : 'b' } };
+    var third  = { file : { name : 'c' } };
+    var fourth = { file : { name : 'd' } };
 
     itemLinker.parentChild([first, second], [third, fourth]);
 
@@ -128,10 +128,10 @@ test('item-linker parentChild', {
 
 
   'links children and parents by index': function () {
-    var first  = { meta : { fileName : 'a' } };
-    var second = { meta : { fileName : 'b' } };
-    var third  = { meta : { fileName : 'c' } };
-    var fourth = { meta : { fileName : 'd' } };
+    var first  = { file : { name : 'a' } };
+    var second = { file : { name : 'b' } };
+    var third  = { file : { name : 'c' } };
+    var fourth = { file : { name : 'd' } };
 
     itemLinker.parentChild([first, second], [third, fourth]);
 
@@ -146,11 +146,11 @@ test('item-linker parentChild', {
   },
 
 
-  'links children and parents by fileName': function () {
-    var first  = { meta : { fileName : 'a' } };
-    var second = { meta : { fileName : 'b' } };
-    var third  = { meta : { fileName : 'c' } };
-    var fourth = { meta : { fileName : 'd' } };
+  'links children and parents by name': function () {
+    var first  = { file : { name : 'a' } };
+    var second = { file : { name : 'b' } };
+    var third  = { file : { name : 'c' } };
+    var fourth = { file : { name : 'd' } };
 
     itemLinker.parentChild([first, second], [third, fourth]);
 

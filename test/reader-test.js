@@ -85,7 +85,7 @@ test('reader', {
 
   'yields item reader results': function () {
     templateReader.read.yields(null, {});
-    var result = [{ meta : { fileName : 'x/y/z' } }];
+    var result = [{ file : { name : 'x/y/z' } }];
     itemReader.read.yields(null, result);
     folderReader.readFolders.yields(null, []);
     var spy = sinon.spy();
@@ -219,11 +219,11 @@ test('reader', {
     this.spy(reader, 'read');
     this.stub(itemLinker, 'parentChild');
     templateReader.read.yields(null, {});
-    var firstParentItem  = { meta : { fileName : 'p1' } };
-    var secondParentItem = { meta : { fileName : 'p2' } };
-    var firstChildItem   = { meta : { fileName : 'c1' } };
-    var secondChildItem  = { meta : { fileName : 'c2' } };
-    var thirdChildItem   = { meta : { fileName : 'c3' } };
+    var firstParentItem  = { file : { name : 'p1' } };
+    var secondParentItem = { file : { name : 'p2' } };
+    var firstChildItem   = { file : { name : 'c1' } };
+    var secondChildItem  = { file : { name : 'c2' } };
+    var thirdChildItem   = { file : { name : 'c3' } };
 
     reader.read('x', {}, function () {});
     itemReader.read.invokeCallback(null, [firstParentItem, secondParentItem]);
@@ -235,8 +235,8 @@ test('reader', {
       items : [thirdChildItem]
     });
 
-    var virtualItemA = { meta : { dirName : 'a', path : 'x/a' } };
-    var virtualItemB = { meta : { dirName : 'b', path : 'x/b' } };
+    var virtualItemA = { file : { dirName : 'a', path : 'x/a' } };
+    var virtualItemB = { file : { dirName : 'b', path : 'x/b' } };
     sinon.assert.calledThrice(itemLinker.parentChild);
     sinon.assert.calledWith(itemLinker.parentChild,
         [virtualItemA], [firstChildItem, secondChildItem]);
