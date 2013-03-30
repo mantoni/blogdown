@@ -11,6 +11,7 @@ var test     = require('utest');
 var assert   = require('assert');
 var sinon    = require('sinon');
 
+var mustache = require('mustache');
 var renderer = require('../lib/html-renderer');
 
 
@@ -28,7 +29,7 @@ test('renderer', {
   },
 
   'returns empty array': function () {
-    var results = renderer.render([], {});
+    var results = renderer.render([], {}, {});
 
     assert.deepEqual(results, []);
   },
@@ -39,7 +40,7 @@ test('renderer', {
       file : testFile,
       md   : '<p>from markdown</p>',
       html : '<div>{{{md}}}</div>'
-    }], {});
+    }], {}, {});
 
     assert.deepEqual(results, [{
       path : 'test.html',
@@ -53,7 +54,7 @@ test('renderer', {
       file : testFile,
       some : 'stuff',
       html : '<div>{{>heading}}</div>'
-    }], {
+    }], {}, {
       heading : '<h1>{{some}}</h1>'
     });
 
@@ -65,17 +66,57 @@ test('renderer', {
 
 
   'does not create file object if html is missing': function () {
-    var results = renderer.render([{ file : { path : 'unknown' } }]);
+    var results = renderer.render([{ file : { path : 'unknown' } }], {});
 
     assert.deepEqual(results, []);
   },
 
 
   'logs a warning if html is missing': function () {
-    renderer.render([{ file : { path : 'unknown/foo', name : 'foo' } }]);
+    renderer.render([{ file : { path : 'unknown/foo', name : 'foo' } }], {});
 
     sinon.assert.calledOnce(console.warn);
     sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown/foo');
-  }
+  },
+
+
+  'sets all lists on each item before passing to mustache': sinon.test(
+    function () {
+      this.stub(mustache, 'render');
+      renderer.render([{ file : testFile, html : '<html/>' }], {
+        foo : [{ a : 1 }],
+        bar : [{ b : 2 }]
+      });
+
+      sinon.assert.calledOnce(mustache.render);
+      sinon.assert.calledWithMatch(mustache.render, '', {
+        foo : [{ a : 1 }],
+        bar : [{ b : 2 }]
+      });
+    }
+  ),
+
+
+  'sets item as active on list that contains the item': sinon.test(
+    function () {
+      var fooActive;
+      var barActive;
+      this.stub(mustache, 'render', function (template, data) {
+        fooActive = data.foo.active;
+        barActive = data.bar.active;
+      });
+      var item = { file : testFile, html : '<html/>' };
+      var list = [{}, item];
+      renderer.render([item], {
+        foo : list,
+        bar : [{ b : 2 }]
+      });
+
+      assert.strictEqual(fooActive, item);
+      assert.strictEqual(barActive, undefined);
+      // was it deleted afterwards?
+      assert.strictEqual(list.active, undefined);
+    }
+  )
 
 });

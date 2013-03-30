@@ -16,6 +16,7 @@ var reader    = require('../lib/reader');
 var processor = require('../lib/item-processor');
 var renderer  = require('../lib/html-renderer');
 var writer    = require('../lib/file-writer');
+var list      = require('../lib/list');
 
 
 test('blogdown', {
@@ -25,7 +26,8 @@ test('blogdown', {
     sinon.stub(writer, 'write');
     sinon.stub(processor, 'process');
     sinon.stub(renderer, 'render');
-    this.options = { dateFormat : 'dd.MM.YYYY' };
+    sinon.stub(list, 'createAll');
+    this.options = { dates : { someFormat : 'dd.MM.YYYY' } };
   },
 
   after: function () {
@@ -33,6 +35,7 @@ test('blogdown', {
     writer.write.restore();
     processor.process.restore();
     renderer.render.restore();
+    list.createAll.restore();
   },
 
 
@@ -56,14 +59,42 @@ test('blogdown', {
   },
 
 
+  'creates lists after processig': function () {
+    var item = { file : { path : 'src/foo' }, some : 'item' };
+    var items = [item];
+    reader.read.yields(null, { items : items, partials : {} });
+
+    blogdown('src', 'site', this.options, function () {});
+
+    sinon.assert.calledOnce(list.createAll);
+    sinon.assert.calledWith(list.createAll, items, this.options.lists);
+    sinon.assert.callOrder(processor.process, list.createAll);
+  },
+
+
   'renders items after processing': function () {
-    var item = { file : { path : 'some/source/foo' }, some : 'item' };
+    list.createAll.returns({});
+    var item = { file : { path : 'src/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
 
-    blogdown('some/source', 'some/target', this.options, function () {});
+    blogdown('src', 'site', this.options, function () {});
 
     sinon.assert.calledOnce(renderer.render);
-    sinon.assert.calledWith(renderer.render, [item], { p : '<p/>' });
+    sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
+    sinon.assert.callOrder(processor.process, renderer.render);
+  },
+
+
+  'passes lists to render': function () {
+    var lists = { foo : [{ n : 1 }] };
+    list.createAll.returns(lists);
+    var item = { file : { path : 'src/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [item], partials : {} });
+
+    blogdown('src', 'site', this.options, function () {});
+
+    sinon.assert.calledOnce(renderer.render);
+    sinon.assert.calledWith(renderer.render, [item], lists, {});
     sinon.assert.callOrder(processor.process, renderer.render);
   },
 

@@ -30,7 +30,7 @@ test('processor', {
   'adds created and modified for timestamps using multiple formats':
     sinon.test(function () {
       processor.process([this.item], '', {
-        dateFormats : {
+        dates       : {
           fullDate  : 'MMMM Do YYYY',
           someTime  : 'HH:mm:ss'
         }

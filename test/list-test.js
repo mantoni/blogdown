@@ -221,3 +221,20 @@ test('list next', {
   }
 
 });
+
+
+test('list createAll', {
+
+  'creates a map of lists for the given config': function () {
+    var result = list.createAll([{ n : 1 }, { n : 2 }], {
+      foo : { limit : 1 },
+      bar : { sort  : 'n DESC' }
+    });
+
+    assert.deepEqual(result, {
+      foo : [{ n : 1 }],
+      bar : [{ n : 2 }, { n : 1 }]
+    });
+  }
+
+});
