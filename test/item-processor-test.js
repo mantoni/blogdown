@@ -35,10 +35,10 @@ test('processor', {
         }
       });
 
-      assert.equal(this.item.fullDate.created, 'January 1st 1970');
-      assert.equal(this.item.fullDate.modified, 'January 1st 1970');
-      assert.equal(this.item.someTime.created, '01:00:00');
-      assert.equal(this.item.someTime.modified, '01:00:00');
+      assert.equal(this.item.dates.fullDate.created, 'January 1st 1970');
+      assert.equal(this.item.dates.fullDate.modified, 'January 1st 1970');
+      assert.equal(this.item.dates.someTime.created, '01:00:00');
+      assert.equal(this.item.dates.someTime.modified, '01:00:00');
     }),
 
 

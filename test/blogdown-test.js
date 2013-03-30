@@ -113,6 +113,22 @@ test('blogdown', {
   },
 
 
+  'adds root property to file': function () {
+    var foo = { file : { path : 'source/one' } };
+    var bar = { file : { path : 'source/and/two' } };
+    var baz = { file : { path : 'source/and/then/three' } };
+    reader.read.yields(null, {
+      items : [foo, bar, baz]
+    });
+
+    blogdown('source', 'target', this.options, function () {});
+
+    assert.equal(foo.file.root, '.');
+    assert.equal(bar.file.root, '..');
+    assert.equal(baz.file.root, '../..');
+  },
+
+
   'writes renderer return value': function () {
     reader.read.yields(null, { items : [] });
     var files = [{ path : 'the/foo', html : '...' }];

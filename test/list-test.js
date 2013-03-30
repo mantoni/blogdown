@@ -72,7 +72,7 @@ test('list sort', {
   'throws if order direction is not ASC or DESC': function () {
     assert.throws(function () {
       list.create([], { sort : 'a FOO' });
-    }, /^SyntaxError\: Cannot sort by "a FOO"; Illegal expression$/);
+    }, /^SyntaxError\: Cannot sort list by "a FOO"; Illegal expression$/);
   },
 
 
@@ -87,21 +87,21 @@ test('list sort', {
   'throws meaningful error if property is undefined': function () {
     assert.throws(function () {
       list.create([{ a : 1 }, { a : 2 }], { sort : 'b' });
-    }, /^Error\: Cannot sort by "b"; Unknown property "b"$/);
+    }, /^Error\: Cannot sort list by "b"; Unknown property "b"$/);
   },
 
 
   'throws meaningful error if property path is undefined': function () {
     assert.throws(function () {
       list.create([{ a : { b : 1 } }, { a : { c : 2 } }], { sort : 'a.c' });
-    }, /^Error\: Cannot sort by "a\.c"; Unknown property "c"$/);
+    }, /^Error\: Cannot sort list by "a\.c"; Unknown property "c"$/);
   },
 
 
   'throws meaningful error if property path cannot be resolved': function () {
     assert.throws(function () {
       list.create([{ a : { b : 1 } }, { a : { c : 2 } }], { sort : 'a.b.c' });
-    }, /^Error\: Cannot sort by "a\.b\.c"; Unknown property "c"$/);
+    }, /^Error\: Cannot sort list by "a\.b\.c"; Unknown property "c"$/);
   }
 
 });
@@ -148,7 +148,14 @@ test('list filter', {
   'throws if filter does not make sense': function () {
     assert.throws(function () {
       list.create([], { filter : 'a # b' });
-    }, /^SyntaxError\: Cannot filter by "a # b"; Illegal expression$/);
+    }, /^SyntaxError\: Cannot filter list by "a # b"; Illegal expression$/);
+  },
+
+
+  'resolves property path': function () {
+    var result = list.create([{ a : { b : 42 } }], { filter : 'a.b = 42' });
+
+    assert.equal(result.length, 1);
   }
 
 });
