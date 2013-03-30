@@ -48,23 +48,29 @@ The internal model of each item that is passed to Mustache looks like this:
 ```js
 {
   // File related meta information:
-  meta       : {
-    path     : 'path/to/file', // without extension
-    fileName : 'file',         //     -- " --
-    created  : '2013-03-17T22:01:53+01:00',
-    modified : '2013-03-17T22:01:53+01:00'
+  file         : {
+    path       : 'path/to/file', // without extension
+    name       : 'file',         //     -- " --
+    root       : '../..',        // relative path to root dir
+    created    : '2013-03-17T22:01:53+01:00',
+    modified   : '2013-03-17T22:01:53+01:00'
   },
 
-  // Links to other items:
-  previous : { ... }, // previous item in same folder
-  next     : { ... },
-  sibling  : [ ... ], // array, but also accessible by fileName
-  child    : [ ... ], //           -- " --
-  parent   : [ ... ], //           -- " --
+  // Markdown:
+  md           : '<p>parsed from markdown</p>',
 
-  html : '<html/>',
-  md   : '<p>parsed from markdown</p>',
+  // Formatted dates according to config in "blogdown.json":
+  dates        : {
+    article    : {
+      created  : 'Sun, 31. March 2013 - 17:24 CET',
+      modified : 'Sun, 31. March 2013 - 17:24 CET'
+    }
+  },
 
-  any  : 'property defined in a .json file'
+  // Lists of items according to config in "blogdown.json":
+  newArticles  : [{ ... }, { ... }],
+  coolProjects : [{ ... }, { ... }],
+
+  anyProperty  : 'defined in a .json file'
 }
 ```
