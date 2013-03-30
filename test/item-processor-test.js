@@ -13,7 +13,6 @@ var sinon      = require('sinon');
 
 var fs         = require('fs');
 var processor  = require('../lib/item-processor');
-var itemLinker = require('../lib/item-linker');
 
 
 test('processor', {

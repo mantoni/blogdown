@@ -17,7 +17,6 @@ var templateReader = require('../lib/template-reader');
 var itemReader     = require('../lib/item-reader');
 var folderReader   = require('../lib/folder-reader');
 var fileReader     = require('../lib/file-reader');
-var itemLinker     = require('../lib/item-linker');
 
 
 test('reader', {
@@ -184,20 +183,6 @@ test('reader', {
     sinon.assert.calledOnce(merger.apply);
     sinon.assert.calledWith(merger.apply,
       [sinon.match.has('html', '<blockquote/>')], template.json);
-  }),
-
-
-  'passes items to itemLinker.previousNext': sinon.test(function () {
-    this.stub(itemLinker, 'previousNext');
-    templateReader.read.yields(null, {});
-    var firstItem  = {};
-    var secondItem = {};
-    itemReader.read.yields(null, [firstItem, secondItem]);
-
-    reader.read('x', {}, function () {});
-
-    sinon.assert.calledOnce(itemLinker.previousNext);
-    sinon.assert.calledWith(itemLinker.previousNext, [firstItem, secondItem]);
   })
 
 });
