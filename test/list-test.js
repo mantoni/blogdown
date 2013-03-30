@@ -152,3 +152,72 @@ test('list filter', {
   }
 
 });
+
+
+test('list previous', {
+
+  before: function () {
+    this.list = list.create([{ n : 1 }, { n : 2}, { n : 3 }], {});
+  },
+
+  'is null by default': function () {
+    assert.strictEqual(this.list.previous, null);
+  },
+
+
+  'is null if first item is active': function () {
+    this.list.active = this.list[0];
+
+    assert.strictEqual(this.list.previous, null);
+  },
+
+
+  'is first element if second element is active': function () {
+    this.list.active = this.list[1];
+
+    assert.strictEqual(this.list.previous, this.list[0]);
+  },
+
+
+  'is second element if third element is active': function () {
+    this.list.active = this.list[2];
+
+    assert.strictEqual(this.list.previous, this.list[1]);
+  }
+
+});
+
+
+
+test('list next', {
+
+  before: function () {
+    this.list = list.create([{ n : 1 }, { n : 2}, { n : 3 }], {});
+  },
+
+  'is null by default': function () {
+    assert.strictEqual(this.list.next, null);
+  },
+
+
+  'is null if last item is active': function () {
+    this.list.active = this.list[2];
+
+    assert.strictEqual(this.list.next, null);
+  },
+
+
+  'is second element if first element is active': function () {
+    this.list.active = this.list[0];
+
+    assert.strictEqual(this.list.next, this.list[1]);
+  },
+
+
+  'is third element if second element is active': function () {
+    this.list.active = this.list[1];
+
+    assert.strictEqual(this.list.next, this.list[2]);
+  }
+
+});
