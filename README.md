@@ -1,6 +1,6 @@
 # Blogdown
 
-Generate HTML with Mustache and Markdown
+Generate HTML with [Mustache](http://mustache.github.com) and [Markdown](http://daringfireball.net/projects/markdown/syntax)
 
 ## Goals
 
@@ -8,11 +8,11 @@ Generate HTML with Mustache and Markdown
  - Generate static HTML using templates, partials and JSON data.
  - Generate only the files that changed, adding created and modified timestamps.
  - Plain text files only. No database. No setup.
+ - Full test coverage
 
 ## Current Status
 
-Heavy development. Things will likely change a lot.
-Feedback, issues and pull requests welcome.
+In development. Feedback, issues and pull requests welcome.
 
 ## Install
 
@@ -20,30 +20,68 @@ Feedback, issues and pull requests welcome.
 npm install -g blogdown
 ```
 
-## Usage
-
-From within your web site project directory run:
-
-```
-blogdown
-```
-
 ## Get Started
 
  - Create `src/template.mustache` with some HTML and `{{{md}}}` somewhere
  - Create `src/index.md` with some Markdown in it
- - Run `blogdown` and inspect the generated `site/index.html`
+ - Run `blogdown` from the root of the project directory and inspect the generated `site/index.html`
 
-## Get Fancy
+## JSON properties
 
- - Create `src/index.json` with some JSON in it and access it from the template
- - Create `src/test.md`, run `blogdown` and see what's in `site/test.md`
- - Create `src/template/` with some `.mustache` files in it and use them as partials
- - Create `src/test.mustache` to override the template
+Create a `template.json` file and reference the values from any mustache template with `{{some.property}}`.
+
+## Config file
+
+Global configs are stored in a `blogdown.json` file in the root of your project.
+The file defines date formats and lists of files.
+
+## Date formats
+
+Blogdown uses [moment.js](http://momentjs.com) for date formatting. A list of date formats can be configured in the config file:
+
+```
+"dates"   : {
+  "long"  : "ddd, DD. MMMM YYYY - HH:mm:ss",
+  "short" : "DD.MM.YYYY HH:mm:ss",
+  // ...
+}
+```
+
+The mustache templates can refer to the dates like this:
+
+ - `{{dates.long.created}}` for the long format showing the file creation date and time
+ - `{{dates.long.modified}}` for the long format showing the file's last modified date and time
+ - `{{dates.short.created}}`
+ - etc ...
+
+## Lists
+
+You can specify custom lists of files in the global config files:
+
+```
+"lists"      : {
+  "articles" : {
+    "filter" : "file.path = blog/*",
+    "sort"   : "file.created DESC",
+    "limit"  : 25
+  }
+}
+```
+
+An array of items with the configured name will be available in the mustache template:
+
+```
+{{#articles}}
+  <a href="{{{file.path}}}"><h3>{{heading}}</h3></a>
+  <p>{{tldr}}</p>
+{{/articles}}
+```
+
+This will show 25 items from the blog folder ordered newest files first.
 
 ## Item Structure
 
-The internal model of each item that is passed to Mustache looks like this:
+The model of each item that is passed to Mustache for rendering looks like this:
 
 ```js
 {
@@ -53,7 +91,8 @@ The internal model of each item that is passed to Mustache looks like this:
     name       : 'file',         //     -- " --
     root       : '../..',        // relative path to root dir
     created    : '2013-03-17T22:01:53+01:00',
-    modified   : '2013-03-17T22:01:53+01:00'
+    modified   : '2013-03-17T22:01:53+01:00',
+    active     : true // if this file is currently rendered, otherwise false
   },
 
   // Markdown:
@@ -74,3 +113,13 @@ The internal model of each item that is passed to Mustache looks like this:
   anyProperty  : 'defined in a .json file'
 }
 ```
+
+
+## Credits
+
+This project was build on top of the hard work of other people:
+
+ - https://github.com/chjj/marked
+ - https://github.com/janl/mustache.js
+ - https://github.com/timrwood/moment
+
