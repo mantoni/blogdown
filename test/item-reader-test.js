@@ -30,7 +30,7 @@ test('reader', {
 
 
   'reads the given directory with folder-reader': function () {
-    reader.read('a/b/c', function () {});
+    reader.read('a/b/c', {}, function () {});
 
     sinon.assert.calledOnce(folderReader.readFiles);
     sinon.assert.calledWith(folderReader.readFiles, 'a/b/c');
@@ -40,7 +40,7 @@ test('reader', {
   'passes readFiles results to file-reader': function () {
     folderReader.readFiles.yields(null, ['a', 'b']);
 
-    reader.read('x/y/z', function () {});
+    reader.read('x/y/z', {}, function () {});
 
     sinon.assert.calledTwice(fileReader.read);
     sinon.assert.calledWith(fileReader.read, 'x/y/z/a');
@@ -60,7 +60,7 @@ test('reader', {
     fileReader.read.yields(null, item);
     var spy = sinon.spy();
 
-    reader.read('x', spy);
+    reader.read('x', {}, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, [item]);
@@ -70,7 +70,7 @@ test('reader', {
   'does not include template item in result': function () {
     folderReader.readFiles.yields(null, ['template']);
 
-    reader.read('x', function () {});
+    reader.read('x', {}, function () {});
 
     sinon.assert.notCalled(fileReader.read);
   }

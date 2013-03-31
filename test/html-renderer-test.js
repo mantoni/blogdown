@@ -15,7 +15,7 @@ var mustache = require('mustache');
 var renderer = require('../lib/html-renderer');
 
 
-var testFile = { path : 'test' };
+var testFile = { path : 'test.html' };
 
 
 test('renderer', {
@@ -97,26 +97,23 @@ test('renderer', {
   ),
 
 
-  'sets item as active on list that contains the item': sinon.test(
-    function () {
-      var fooActive;
-      var barActive;
-      this.stub(mustache, 'render', function (template, data) {
-        fooActive = data.foo.active;
-        barActive = data.bar.active;
-      });
-      var item = { file : testFile, html : '<html/>' };
-      var list = [{}, item];
-      renderer.render([item], {
-        foo : list,
-        bar : [{ b : 2 }]
-      });
+  'sets item as current on context': sinon.test(function () {
+    this.stub(mustache, 'render');
+    var spy = sinon.spy();
+    var context = Object.create({}, {
+      current: {
+        set: spy
+      }
+    });
+    var item = { file : testFile, html : '</>' };
 
-      assert.strictEqual(fooActive, item);
-      assert.strictEqual(barActive, undefined);
-      // was it deleted afterwards?
-      assert.strictEqual(list.active, undefined);
-    }
-  )
+    renderer.render([item], { l : [{}, item] }, {}, context);
+
+    sinon.assert.calledTwice(spy);
+    sinon.assert.calledWith(spy, item);
+    sinon.assert.calledWith(spy, null);
+    sinon.assert.callOrder(spy.withArgs(item), mustache.render,
+        spy.withArgs(null));
+  })
 
 });

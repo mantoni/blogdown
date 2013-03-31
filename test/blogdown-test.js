@@ -99,33 +99,15 @@ test('blogdown', {
   },
 
 
-  'removes source directory from path': function () {
-    var foo = { file : { path : 'source/the/foo' } };
-    var bar = { file : { path : 'source/the/bar' } };
-    reader.read.yields(null, {
-      items : [foo, bar]
-    });
+  'passes same context into renderer that was passed to lists': function () {
+    reader.read.yields(null, { items : [], partials : {} });
 
-    blogdown('source', 'target', this.options, function () {});
+    blogdown('src', 'site', this.options, function () {});
 
-    assert.equal(foo.file.path, 'the/foo');
-    assert.equal(bar.file.path, 'the/bar');
-  },
-
-
-  'adds root property to file': function () {
-    var foo = { file : { path : 'source/one' } };
-    var bar = { file : { path : 'source/and/two' } };
-    var baz = { file : { path : 'source/and/then/three' } };
-    reader.read.yields(null, {
-      items : [foo, bar, baz]
-    });
-
-    blogdown('source', 'target', this.options, function () {});
-
-    assert.equal(foo.file.root, '.');
-    assert.equal(bar.file.root, '..');
-    assert.equal(baz.file.root, '../..');
+    var context = renderer.render.firstCall.args[3];
+    assert.equal(typeof context, 'object');
+    assert.strictEqual(context, list.createAll.firstCall.args[2]);
+    assert.equal(context.root, 'src');
   },
 
 

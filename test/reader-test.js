@@ -37,10 +37,10 @@ test('reader', {
   'reads items': function () {
     templateReader.read.yields(null, {});
 
-    reader.read('x/y', {});
+    reader.read('x/y', {}, {});
 
     sinon.assert.calledOnce(itemReader.read);
-    sinon.assert.calledWith(itemReader.read, 'x/y', sinon.match.func);
+    sinon.assert.calledWith(itemReader.read, 'x/y', {}, sinon.match.func);
   },
 
 
@@ -48,7 +48,7 @@ test('reader', {
     templateReader.read.yields(null, {});
     itemReader.read.yields(null, []);
 
-    reader.read('x/y', {}, function () {});
+    reader.read('x/y', {}, {}, function () {});
 
     sinon.assert.calledOnce(folderReader.readFolders);
     sinon.assert.calledWith(folderReader.readFolders, 'x/y');
@@ -60,7 +60,7 @@ test('reader', {
     itemReader.read.yields(null, []);
     this.spy(reader, 'read');
 
-    reader.read('x/y', {}, function () {});
+    reader.read('x/y', {}, {}, function () {});
     folderReader.readFolders.firstCall.invokeCallback(null, ['a', 'b']);
 
     sinon.assert.calledThrice(reader.read);
@@ -75,7 +75,7 @@ test('reader', {
       folderReader.readFolders.yields(null, ['template']);
       this.spy(reader, 'read');
 
-      reader.read('x/y', {}, function () {});
+      reader.read('x/y', {}, {}, function () {});
 
       sinon.assert.calledOnce(reader.read);
     }
@@ -89,7 +89,7 @@ test('reader', {
     folderReader.readFolders.yields(null, []);
     var spy = sinon.spy();
 
-    reader.read('x/y', {}, spy);
+    reader.read('x/y', {}, {}, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, { items : result });
@@ -103,7 +103,7 @@ test('reader', {
     folderReader.readFolders.yields(null, []);
     var spy = sinon.spy();
 
-    reader.read('x/y', {}, spy);
+    reader.read('x/y', {}, {}, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
@@ -115,7 +115,7 @@ test('reader', {
       templateReader.read.yields(null, {});
       var spy = sinon.spy();
 
-      reader.read('x/y', {}, spy);
+      reader.read('x/y', {}, {}, spy);
       itemReader.read.firstCall.invokeCallback(null, [{ p1 : 1 }]);
       folderReader.readFolders.firstCall.invokeCallback(null, ['a', 'b']);
       itemReader.read.secondCall.invokeCallback(null, [{ p2 : 2 }]);
@@ -134,7 +134,7 @@ test('reader', {
   'creates template with given parent template': function () {
     var parentTemplate = { some : 'template' };
 
-    reader.read('x', parentTemplate, function () {});
+    reader.read('x', parentTemplate, {}, function () {});
 
     sinon.assert.calledOnce(templateReader.read);
     sinon.assert.calledWith(templateReader.read, 'x', parentTemplate);
@@ -148,7 +148,7 @@ test('reader', {
     folderReader.readFolders.yields(null, []);
     var spy = sinon.spy();
 
-    reader.read('x', {}, spy);
+    reader.read('x', {}, {}, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
@@ -163,7 +163,7 @@ test('reader', {
     itemReader.read.yields(null, items);
     folderReader.readFolders.yields(null, []);
 
-    reader.read('x', {}, function () {});
+    reader.read('x', {}, {}, function () {});
 
     sinon.assert.calledOnce(merger.apply);
     sinon.assert.calledWith(merger.apply, items, template.json);
@@ -178,7 +178,7 @@ test('reader', {
     itemReader.read.yields(null, items);
     folderReader.readFolders.yields(null, []);
 
-    reader.read('x', {}, function () {});
+    reader.read('x', {}, {}, function () {});
 
     sinon.assert.calledOnce(merger.apply);
     sinon.assert.calledWith(merger.apply,

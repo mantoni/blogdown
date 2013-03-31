@@ -19,7 +19,7 @@ test('processor', {
 
   before: function () {
     sinon.stub(fs, 'existsSync').returns(false);
-    this.item = { file : {} };
+    this.item = { file : { path : '' } };
   },
 
   after: function () {

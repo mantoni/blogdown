@@ -9,6 +9,7 @@
 
 var test   = require('utest');
 var assert = require('assert');
+var sinon  = require('sinon');
 
 var list   = require('../lib/list');
 
@@ -16,7 +17,7 @@ var list   = require('../lib/list');
 test('list', {
 
   'returns the array unmodified': function () {
-    var result = list.create([{ foo: 'foo' }, { bar : 'bar' }], {});
+    var result = list.create([{ foo: 'foo' }, { bar : 'bar' }], {}, {});
 
     assert.deepEqual(result, [{ foo: 'foo' }, { bar : 'bar' }]);
   }
@@ -161,70 +162,40 @@ test('list filter', {
 });
 
 
-test('list previous', {
+test('list nav', {
 
   before: function () {
-    this.list = list.create([{ n : 1 }, { n : 2}, { n : 3 }], {});
+    var context = this.context = {};
+    this.list = list.create([{ n : 1 }, { n : 2}, { n : 3 }], {}, context);
   },
 
-  'is null by default': function () {
-    assert.strictEqual(this.list.previous, null);
-  },
-
-
-  'is null if first item is active': function () {
-    this.list.active = this.list[0];
-
-    assert.strictEqual(this.list.previous, null);
+  'initialized previous and next with null': function () {
+    assert.strictEqual(this.list.nav.previous, null);
+    assert.strictEqual(this.list.nav.next, null);
   },
 
 
-  'is first element if second element is active': function () {
-    this.list.active = this.list[1];
+  'activates the first item': function () {
+    this.context.current = this.list[0];
 
-    assert.strictEqual(this.list.previous, this.list[0]);
+    assert.strictEqual(this.list.nav.previous, null);
+    assert.strictEqual(this.list.nav.next, this.list[1]);
   },
 
 
-  'is second element if third element is active': function () {
-    this.list.active = this.list[2];
+  'activates the second item': function () {
+    this.context.current = this.list[1];
 
-    assert.strictEqual(this.list.previous, this.list[1]);
-  }
-
-});
-
-
-
-test('list next', {
-
-  before: function () {
-    this.list = list.create([{ n : 1 }, { n : 2}, { n : 3 }], {});
-  },
-
-  'is null by default': function () {
-    assert.strictEqual(this.list.next, null);
+    assert.strictEqual(this.list.nav.previous, this.list[0]);
+    assert.strictEqual(this.list.nav.next, this.list[2]);
   },
 
 
-  'is null if last item is active': function () {
-    this.list.active = this.list[2];
+  'activates the third item': function () {
+    this.context.current = this.list[2];
 
-    assert.strictEqual(this.list.next, null);
-  },
-
-
-  'is second element if first element is active': function () {
-    this.list.active = this.list[0];
-
-    assert.strictEqual(this.list.next, this.list[1]);
-  },
-
-
-  'is third element if second element is active': function () {
-    this.list.active = this.list[1];
-
-    assert.strictEqual(this.list.next, this.list[2]);
+    assert.strictEqual(this.list.nav.previous, this.list[1]);
+    assert.strictEqual(this.list.nav.next, null);
   }
 
 });
@@ -242,6 +213,16 @@ test('list createAll', {
       foo : [{ n : 1 }],
       bar : [{ n : 2 }, { n : 1 }]
     });
-  }
+  },
+
+  'passes context  and list name to create': sinon.test(function () {
+    this.spy(list, 'create');
+    var context = { some : 'context' };
+
+    list.createAll([], { foo : { limit : 1 } }, context);
+
+    sinon.assert.calledWith(list.create, sinon.match.any, sinon.match.any,
+      context, 'foo');
+  })
 
 });
