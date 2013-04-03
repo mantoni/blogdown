@@ -17,6 +17,34 @@ var processor = require('../lib/item-processor');
 var renderer  = require('../lib/html-renderer');
 var writer    = require('../lib/file-writer');
 var list      = require('../lib/list');
+var meta      = require('../lib/meta');
+
+
+var EMPTY_META_RESULT = {
+  created : [],
+  updated : [],
+  deleted : [],
+  meta    : {}
+};
+
+
+var createMetaWithCreated = function (items) {
+  return {
+    created : items,
+    updated : [],
+    deleted : [],
+    meta    : {}
+  };
+};
+
+var createMetaWithUpdated = function (items) {
+  return {
+    created : [],
+    updated : items,
+    deleted : [],
+    meta    : {}
+  };
+};
 
 
 test('blogdown', {
@@ -27,6 +55,8 @@ test('blogdown', {
     sinon.stub(processor, 'process');
     sinon.stub(renderer, 'render');
     sinon.stub(list, 'createAll');
+    sinon.stub(meta, 'update');
+    sinon.stub(meta, 'persist');
     this.options = { dates : { someFormat : 'dd.MM.YYYY' } };
   },
 
@@ -36,6 +66,8 @@ test('blogdown', {
     processor.process.restore();
     renderer.render.restore();
     list.createAll.restore();
+    meta.update.restore();
+    meta.persist.restore();
   },
 
 
@@ -47,22 +79,35 @@ test('blogdown', {
   },
 
 
-  'processes items from reader yield with options': function () {
+  'updates meta with items from reader': function () {
     var item = { file : { path : 'some/source/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : {} });
 
     blogdown('some/source', 'some/target', this.options, function () {});
 
-    sinon.assert.calledOnce(processor.process);
+    sinon.assert.calledOnce(meta.update);
+    sinon.assert.calledWith(meta.update, 'blogdown.meta', [item]);
+    sinon.assert.notCalled(processor.process);
+  },
+
+  'processes items from reader using given options': function () {
+    var item = { file : { path : 'some/source/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [item], partials : {} });
+    meta.update.yields(null, EMPTY_META_RESULT);
+
+    blogdown('some/source', 'some/target', this.options, function () {});
+
+    sinon.assert.called(processor.process);
     sinon.assert.calledWith(processor.process, [item],
         'some/source', this.options);
   },
 
 
-  'creates lists after processig': function () {
+  'creates lists after processing with items from reader': function () {
     var item = { file : { path : 'src/foo' }, some : 'item' };
     var items = [item];
     reader.read.yields(null, { items : items, partials : {} });
+    meta.update.yields(null, EMPTY_META_RESULT);
 
     blogdown('src', 'site', this.options, function () {});
 
@@ -75,7 +120,8 @@ test('blogdown', {
   'renders items after processing': function () {
     list.createAll.returns({});
     var item = { file : { path : 'src/foo' }, some : 'item' };
-    reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
+    reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
+    meta.update.yields(null, createMetaWithCreated([item]));
 
     blogdown('src', 'site', this.options, function () {});
 
@@ -89,7 +135,8 @@ test('blogdown', {
     var lists = { foo : [{ n : 1 }] };
     list.createAll.returns(lists);
     var item = { file : { path : 'src/foo' }, some : 'item' };
-    reader.read.yields(null, { items : [item], partials : {} });
+    reader.read.yields(null, { items : [], partials : {} });
+    meta.update.yields(null, createMetaWithCreated([item]));
 
     blogdown('src', 'site', this.options, function () {});
 
@@ -101,6 +148,7 @@ test('blogdown', {
 
   'passes same context into renderer that was passed to lists': function () {
     reader.read.yields(null, { items : [], partials : {} });
+    meta.update.yields(null, EMPTY_META_RESULT);
 
     blogdown('src', 'site', this.options, function () {});
 
@@ -113,6 +161,7 @@ test('blogdown', {
 
   'writes renderer return value': function () {
     reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
     var files = [{ path : 'the/foo', html : '...' }];
     renderer.render.returns(files);
 
@@ -126,16 +175,54 @@ test('blogdown', {
   },
 
 
-  'yields once writer yields': function () {
+  'errs if writer errs': function () {
     reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
+    var err = new Error();
     var spy = sinon.spy();
 
     blogdown('source', 'target', this.options, spy);
 
     sinon.assert.notCalled(spy);
 
-    writer.write.invokeCallback();
+    writer.write.invokeCallback(err);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, err);
+  },
+
+
+  'passes meta to meta.persist once writer yields': function () {
+    reader.read.yields(null, { items : [] });
+    meta.update.yields(null, {
+      created : [],
+      updated : [],
+      deleted : [],
+      meta    : { some : 'meta' }
+    });
+    renderer.render.returns([]);
+    writer.write.yields();
+
+    blogdown('source', 'target', this.options, function () {});
+
+    sinon.assert.calledOnce(meta.persist);
+    sinon.assert.calledWith(meta.persist, 'blogdown.meta', { some : 'meta' });
+  },
+
+
+  'yields once meta.persist yields': function () {
+    reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
+    renderer.render.returns([]);
+    writer.write.yields();
+    var spy = sinon.spy();
+
+    blogdown('source', 'target', this.options, spy);
+
+    sinon.assert.notCalled(spy);
+
+    meta.persist.invokeCallback();
 
     sinon.assert.calledOnce(spy);
   },
@@ -144,7 +231,24 @@ test('blogdown', {
   'yields error and does not continue if reader errs': function () {
     var err = new Error('ouch');
     reader.read.yields(err);
-    renderer.render.returns([]);
+    var spy = sinon.spy();
+
+    blogdown('some/source', 'some/target', this.options, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, err);
+    sinon.assert.notCalled(meta.update);
+    sinon.assert.notCalled(processor.process);
+    sinon.assert.notCalled(renderer.render);
+    sinon.assert.notCalled(writer.write);
+    sinon.assert.notCalled(meta.persist);
+  },
+
+
+  'yields error and does not continue if meta errs': function () {
+    var err = new Error('ouch');
+    reader.read.yields(null, { items : [] });
+    meta.update.yields(err);
     var spy = sinon.spy();
 
     blogdown('some/source', 'some/target', this.options, spy);
@@ -154,6 +258,7 @@ test('blogdown', {
     sinon.assert.notCalled(processor.process);
     sinon.assert.notCalled(renderer.render);
     sinon.assert.notCalled(writer.write);
+    sinon.assert.notCalled(meta.persist);
   },
 
 
@@ -162,6 +267,7 @@ test('blogdown', {
     var spy = sinon.spy();
     processor.process.throws(err);
     reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
@@ -176,6 +282,7 @@ test('blogdown', {
     var spy = sinon.spy();
     renderer.render.throws(err);
     reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
