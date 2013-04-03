@@ -120,25 +120,33 @@ test('meta update', {
 
 
   'sets created, modified and rendered timestamp for new file': function () {
-    var json = create({});
+    var item = {};
+    var json = create(item);
 
     assert.equal(json.created, '1970-01-01T01:00:00+01:00');
     assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
     assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
+    assert.equal(item.file.created, '1970-01-01T01:00:00+01:00');
+    assert.equal(item.file.modified, '1970-01-01T01:00:00+01:00');
+    assert.equal(item.file.rendered, '1970-01-01T01:00:00+01:00');
   },
 
 
-  'leaves created and updates modified and rendered for updated file':
+  'leaves created but updates modified and rendered for updated file':
     function () {
+      var item = {};
       var json = update({
         created  : 'created',
         modified : 'modified',
         rendered : 'rendered'
-      }, {});
+      }, item);
 
       assert.equal(json.created, 'created');
       assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
       assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
+      assert.equal(item.file.created, 'created');
+      assert.equal(item.file.modified, '1970-01-01T01:00:00+01:00');
+      assert.equal(item.file.rendered, '1970-01-01T01:00:00+01:00');
     },
 
 
@@ -272,6 +280,8 @@ test('meta update', {
     var result = invoke([item]);
 
     assert.deepEqual(result.updated, [item]);
+    assert.equal(result.updated[0].file.path, 'p');
+    assert.equal(result.updated[0].html, '<change/>');
   },
 
 

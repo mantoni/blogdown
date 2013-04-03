@@ -26,20 +26,36 @@ test('processor', {
     fs.existsSync.restore();
   },
 
-  'adds created and modified for timestamps using multiple formats':
-    sinon.test(function () {
-      processor.process([this.item], '', {
-        dates       : {
-          fullDate  : 'MMMM Do YYYY',
-          someTime  : 'HH:mm:ss'
-        }
-      });
+  'adds formatted timestamps for file timestamps': function () {
+    this.item.file.created  = '1970-01-01T01:00:00+01:00';
+    this.item.file.modified = '1970-01-02T02:00:00+01:00';
+    this.item.file.rendered = '1970-01-03T03:00:00+01:00';
 
-      assert.equal(this.item.dates.fullDate.created, 'January 1st 1970');
-      assert.equal(this.item.dates.fullDate.modified, 'January 1st 1970');
-      assert.equal(this.item.dates.someTime.created, '01:00:00');
-      assert.equal(this.item.dates.someTime.modified, '01:00:00');
-    }),
+    processor.process([this.item], '', {
+      dates      : {
+        fullDate : 'MMMM Do YYYY',
+        someTime : 'HH:mm:ss'
+      }
+    });
+
+    assert.equal(this.item.dates.fullDate.created, 'January 1st 1970');
+    assert.equal(this.item.dates.fullDate.modified, 'January 2nd 1970');
+    assert.equal(this.item.dates.fullDate.rendered, 'January 3rd 1970');
+    assert.equal(this.item.dates.someTime.created, '01:00:00');
+    assert.equal(this.item.dates.someTime.modified, '02:00:00');
+    assert.equal(this.item.dates.someTime.rendered, '03:00:00');
+  },
+
+
+  'does not add timestamps if file timestamps do not exist': function () {
+    processor.process([this.item], '', {
+      dates      : {
+        someTime : 'HH:mm:ss'
+      }
+    });
+
+    assert.strictEqual(this.item.dates.someTime, undefined);
+  },
 
 
   'checks for processor.js in given path': function () {
@@ -57,15 +73,7 @@ test('processor', {
     processor.process([this.item], 'test/fixture', {});
 
     assert(this.item.iWasHere);
-  },
-
-
-  'adds created and modified timestamps to file': sinon.test(function () {
-    processor.process([this.item], '', {});
-
-    assert.equal(this.item.file.created, '1970-01-01T01:00:00+01:00');
-    assert.equal(this.item.file.modified, '1970-01-01T01:00:00+01:00');
-  })
+  }
 
 });
 
