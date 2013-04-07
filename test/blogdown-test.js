@@ -228,6 +228,25 @@ test('blogdown', {
   },
 
 
+  'logs files that may be deleted': sinon.test(function () {
+    this.stub(console, 'warn');
+    reader.read.yields(null, { items : [] });
+    meta.update.yields(null, {
+      created : [],
+      updated : [],
+      deleted : ['deleted.html', 'files.html']
+    });
+    renderer.render.returns([]);
+    writer.write.yields();
+
+    blogdown('source', 'target', this.options, function () {});
+
+    sinon.assert.called(console.warn);
+    sinon.assert.calledWith(console.warn,
+      '  rm target/deleted.html target/files.html');
+  }),
+
+
   'yields error and does not continue if reader errs': function () {
     var err = new Error('ouch');
     reader.read.yields(err);
