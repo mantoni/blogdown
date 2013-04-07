@@ -114,7 +114,6 @@ test('meta update', {
 
     var json = invoke([{ file : { path : 'new/item' } }]);
 
-    assert(json.meta.hasOwnProperty('existing/item'));
     assert(json.meta.hasOwnProperty('new/item'));
   },
 
@@ -342,7 +341,21 @@ test('meta update', {
       var result = invoke([]);
 
       assert.deepEqual(result.deleted, ['some/path']);
-    }
+    },
+
+
+  'remove item from meta if it was in file but not in items': function () {
+    setFileContent({
+      'some/path' : {
+        content   : SHA_DEFAULT_CONTENT,
+        html      : SHA_DEFAULT_HTML
+      }
+    });
+
+    var result = invoke([]);
+
+    assert(!result.meta.hasOwnProperty('some/path'));
+  }
 
 });
 
