@@ -196,6 +196,21 @@ test('blogdown', {
   },
 
 
+  'renders all items after processing if --force': function () {
+    list.createAll.returns({});
+    var item = { file : { path : 'src/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
+    meta.update.yields(null, EMPTY_META_RESULT);
+    this.options.force = true;
+
+    blogdown('src', 'site', this.options, function () {});
+
+    sinon.assert.calledOnce(renderer.render);
+    sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
+    sinon.assert.callOrder(processor.process, renderer.render);
+  },
+
+
   'passes lists to render': function () {
     var lists = { foo : [{ n : 1 }] };
     list.createAll.returns(lists);

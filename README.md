@@ -114,6 +114,20 @@ The model of each item that is passed to Mustache for rendering looks like this:
 }
 ```
 
+## Command line options
+
+```
+# Force write all files:
+blogdown --force
+blogdown -f
+
+# Print debug info:
+blogdown --debug
+blogdown -d
+
+# Combined:
+blogdown -df
+```
 
 ## Credits
 

@@ -6,14 +6,23 @@
  *
  * @license MIT
  */
+var log      = require('../lib/log');
 var options  = require('../lib/options');
 var blogdown = require('../lib/blogdown');
+var argv     = require('optimist').argv;
 
 
 options.read('blogdown', function (err, options) {
   if (err) {
     console.error(err);
     return;
+  }
+
+  if (argv.d || argv.debug) {
+    log.enableDebug();
+  }
+  if (argv.f || argv.force) {
+    options.force = true;
   }
 
   var time = Date.now();
