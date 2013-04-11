@@ -17,7 +17,7 @@ var meta   = require('../lib/meta');
 
 function invoke(items) {
   var json;
-  meta.update('m', items, function (err, result) {
+  meta.update(items, { target : 'some/target' }, function (err, result) {
     json = result;
   });
   return json;
@@ -55,6 +55,7 @@ test('meta update', {
 
   before: function () {
     sinon.stub(fs, 'exists');
+    sinon.stub(fs, 'existsSync');
     sinon.stub(fs, 'readFile');
     sinon.stub(fs, 'writeFile');
     this.clock = sinon.useFakeTimers();
@@ -62,23 +63,42 @@ test('meta update', {
 
   after: function () {
     fs.exists.restore();
+    fs.existsSync.restore();
     fs.readFile.restore();
     fs.writeFile.restore();
     this.clock.restore();
   },
 
+  'checks whether file with default path exists': function () {
+    meta.update([], {});
+
+    sinon.assert.calledOnce(fs.exists);
+    sinon.assert.calledWith(fs.exists, 'blogdown.meta', sinon.match.func);
+  },
+
+
   'checks whether file with given path exists': function () {
-    meta.update('some/path.json');
+    meta.update([], { file : 'some/path.json' });
 
     sinon.assert.calledOnce(fs.exists);
     sinon.assert.calledWith(fs.exists, 'some/path.json', sinon.match.func);
   },
 
 
+  'reads file from default path if it exists': function () {
+    fs.exists.yields(true);
+
+    meta.update([], {});
+
+    sinon.assert.calledOnce(fs.readFile);
+    sinon.assert.calledWith(fs.readFile, 'blogdown.meta', sinon.match.func);
+  },
+
+
   'reads file from given path if it exists': function () {
     fs.exists.yields(true);
 
-    meta.update('some/path.json');
+    meta.update([], { file : 'some/path.json' });
 
     sinon.assert.calledOnce(fs.readFile);
     sinon.assert.calledWith(fs.readFile, 'some/path.json', sinon.match.func);
@@ -89,7 +109,7 @@ test('meta update', {
     fs.exists.yields(false);
     var spy = sinon.spy();
 
-    meta.update('foo', [], spy);
+    meta.update([], { file : 'foo' }, spy);
 
     sinon.assert.notCalled(fs.readFile);
     sinon.assert.calledOnce(spy);
@@ -102,7 +122,7 @@ test('meta update', {
     fs.exists.yields(true);
     fs.readFile.yields(err);
 
-    meta.update('foo', [], spy);
+    meta.update([], { file : 'foo' }, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
@@ -329,6 +349,54 @@ test('meta update', {
   },
 
 
+  'checks whether file exists in target': function () {
+    setFileContent({
+      p : {
+        content : SHA_DEFAULT_CONTENT,
+        html    : SHA_DEFAULT_HTML
+      }
+    });
+    var item = { file : { path : 'p' }, some : 'data', html : '<html/>' };
+
+    invoke([item]);
+
+    sinon.assert.calledOnce(fs.existsSync);
+    sinon.assert.calledWith(fs.existsSync, 'some/target/p');
+  },
+
+
+  'adds item as missing if file does not exist in target': function () {
+    setFileContent({
+      p : {
+        content : SHA_DEFAULT_CONTENT,
+        html    : SHA_DEFAULT_HTML
+      }
+    });
+    fs.existsSync.returns(false);
+    var item = { file : { path : 'p' }, some : 'data', html : '<html/>' };
+
+    var result = invoke([item]);
+
+    assert.deepEqual(result.missing, [item]);
+  },
+
+
+  'does not add item as missing if file exists in target': function () {
+    setFileContent({
+      p : {
+        content : SHA_DEFAULT_CONTENT,
+        html    : SHA_DEFAULT_HTML
+      }
+    });
+    fs.existsSync.returns(true);
+    var item = { file : { path : 'p' }, some : 'data', html : '<html/>' };
+
+    var result = invoke([item]);
+
+    assert.deepEqual(result.missing, []);
+  },
+
+
   'yields item path as deleted if it was in file but not in items':
     function () {
       setFileContent({
@@ -377,11 +445,18 @@ test('meta persist', {
         content : 'to persist'
       }
     };
-    meta.persist('some/path', content, function () {});
+    meta.persist(content, {}, function () {});
 
     sinon.assert.calledOnce(fs.writeFile);
-    sinon.assert.calledWith(fs.writeFile, 'some/path',
+    sinon.assert.calledWith(fs.writeFile, 'blogdown.meta',
       JSON.stringify(content, true, '  '));
+  },
+
+
+  'writes file to configured path': function () {
+    meta.persist({}, { file : 'other.meta' }, function () {});
+
+    sinon.assert.calledWith(fs.writeFile, 'other.meta');
   },
 
 
@@ -390,7 +465,7 @@ test('meta persist', {
     var err = new Error();
     fs.writeFile.yields(err);
 
-    meta.persist('foo', {}, spy);
+    meta.persist({}, {}, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
@@ -401,7 +476,7 @@ test('meta persist', {
     fs.writeFile.yields(null);
     var spy = sinon.spy();
 
-    meta.persist('foo', {}, spy);
+    meta.persist({}, {}, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null);

@@ -23,6 +23,7 @@ var meta      = require('../lib/meta');
 var EMPTY_META_RESULT = {
   created : [],
   updated : [],
+  missing : [],
   deleted : [],
   meta    : {}
 };
@@ -32,15 +33,28 @@ var createMetaWithCreated = function (items) {
   return {
     created : items,
     updated : [],
+    missing : [],
     deleted : [],
     meta    : {}
   };
 };
 
-var createMetaWithUpdated = function (items) {
+var createMetaWithModified = function (items) {
   return {
     created : [],
     updated : items,
+    missing : [],
+    deleted : [],
+    meta    : {}
+  };
+};
+
+
+var createMetaWithMissing = function (items) {
+  return {
+    created : [],
+    updated : [],
+    missing : items,
     deleted : [],
     meta    : {}
   };
@@ -86,9 +100,32 @@ test('blogdown', {
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(meta.update);
-    sinon.assert.calledWith(meta.update, 'blogdown.meta', [item]);
+    sinon.assert.calledWith(meta.update, [item]);
     sinon.assert.notCalled(processor.process);
   },
+
+
+  'passes meta options with target dir to meta': function () {
+    reader.read.yields(null, { items : [], partials : {} });
+    this.options.meta = { file : 'other.meta' };
+
+    blogdown('some/source', 'some/target', this.options, function () {});
+
+    sinon.assert.calledWith(meta.update, [], {
+      file   : 'other.meta',
+      target : 'some/target'
+    });
+  },
+
+
+  'defauts meta options to object with target': function () {
+    reader.read.yields(null, { items : [], partials : {} });
+
+    blogdown('some/source', 'some/target', this.options, function () {});
+
+    sinon.assert.calledWith(meta.update, [], { target : 'some/target' });
+  },
+
 
   'processes items from reader using given options': function () {
     var item = { file : { path : 'some/source/foo' }, some : 'item' };
@@ -117,11 +154,39 @@ test('blogdown', {
   },
 
 
-  'renders items after processing': function () {
+  'renders created items after processing': function () {
     list.createAll.returns({});
     var item = { file : { path : 'src/foo' }, some : 'item' };
     reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
     meta.update.yields(null, createMetaWithCreated([item]));
+
+    blogdown('src', 'site', this.options, function () {});
+
+    sinon.assert.calledOnce(renderer.render);
+    sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
+    sinon.assert.callOrder(processor.process, renderer.render);
+  },
+
+
+  'renders modified items after processing': function () {
+    list.createAll.returns({});
+    var item = { file : { path : 'src/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
+    meta.update.yields(null, createMetaWithModified([item]));
+
+    blogdown('src', 'site', this.options, function () {});
+
+    sinon.assert.calledOnce(renderer.render);
+    sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
+    sinon.assert.callOrder(processor.process, renderer.render);
+  },
+
+
+  'renders missing items after processing': function () {
+    list.createAll.returns({});
+    var item = { file : { path : 'src/foo' }, some : 'item' };
+    reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
+    meta.update.yields(null, createMetaWithMissing([item]));
 
     blogdown('src', 'site', this.options, function () {});
 
@@ -198,6 +263,7 @@ test('blogdown', {
     meta.update.yields(null, {
       created : [],
       updated : [],
+      missing : [],
       deleted : [],
       meta    : { some : 'meta' }
     });
@@ -207,7 +273,21 @@ test('blogdown', {
     blogdown('source', 'target', this.options, function () {});
 
     sinon.assert.calledOnce(meta.persist);
-    sinon.assert.calledWith(meta.persist, 'blogdown.meta', { some : 'meta' });
+    sinon.assert.calledWith(meta.persist, { some : 'meta' });
+  },
+
+
+  'passes meta options to meta.persist': function () {
+    reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
+    renderer.render.returns([]);
+    writer.write.yields();
+    this.options.meta = { file : 'other.meta' };
+
+    blogdown('source', 'target', this.options, function () {});
+
+    sinon.assert.calledOnce(meta.persist);
+    sinon.assert.calledWithMatch(meta.persist, {}, { file : 'other.meta' });
   },
 
 
@@ -234,6 +314,7 @@ test('blogdown', {
     meta.update.yields(null, {
       created : [],
       updated : [],
+      missing : [],
       deleted : ['deleted.html', 'files.html']
     });
     renderer.render.returns([]);
