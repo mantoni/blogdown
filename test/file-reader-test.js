@@ -157,6 +157,24 @@ test('file-reader', {
   },
 
 
+  'does not replace existing name property and uses it in path': function () {
+    fs.exists.withArgs('some/test.json').yields(true);
+    fs.readFile.withArgs('some/test.json').yields(null,
+        new Buffer('{"file":{"name":"custom-name"}}'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      file   : {
+        name : 'custom-name',
+        path : 'some/custom-name.html'
+      }
+    });
+  },
+
+
   'file.active is false by default': function () {
     fs.exists.withArgs('some/test.json').yields(true);
     fs.readFile.withArgs('some/test.json').yields(null, new Buffer('{}'));
