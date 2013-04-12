@@ -22,13 +22,16 @@ npm install -g blogdown
 
 ## Get Started
 
- - Create `src/template.mustache` with some HTML and `{{{md}}}` somewhere
- - Create `src/index.md` with some Markdown in it
+ - Create `src/template.mustache` with HTML and a `{{{md}}}` placeholder somewhere
+ - Create `src/index.md` with Markdown in it
  - Run `blogdown` from the root of the project directory and inspect the generated `site/index.html`
 
-## JSON properties
+## Templates and JSON properties
 
-Create a `template.json` file and reference the values from any mustache template with `{{some.property}}`.
+ - The `template.mustache` file in each directory will be used as the mustache template unless an item has a `.html` or `.mustache` template defined.
+ - The `template.json` file can be created to inherit JSON properties into each item in the same folder and sub folders
+ - A `template` folder can be created and filled with mustache templates that will be used as partials. Reference the partials with `{{>partial-name}}`.
+ - If JSON files are created in the template folder, the content is merged into the `template.json` using the file name as the key.
 
 ## Config file
 
@@ -78,6 +81,10 @@ An array of items with the configured name will be available in the mustache tem
 ```
 
 This will show 25 items from the blog folder ordered newest files first.
+
+## Changing the file name
+
+By default, items are generated with their file names. If you want to use a different file name, you need to put `"file" : { "name" : "different" }` in the corresponding `.json` file.
 
 ## Item Structure
 
