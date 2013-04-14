@@ -134,8 +134,8 @@ test('file-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWithMatch(spy, null, {
-      some     : 'json',
-      md       : '<p><em>markdown</em></p>'
+      some : 'json',
+      md   : '<p><em>markdown</em></p>'
     });
   },
 
