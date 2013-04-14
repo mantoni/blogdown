@@ -97,7 +97,6 @@ test('template-reader', {
 
   'yields null and fileReader results': function () {
     fileReader.read.yields(null, {
-      file : { name : 'template' },
       html : '<html/>',
       v    : 42
     });
@@ -142,7 +141,6 @@ test('template-reader', {
   'merges template result and parent template': function () {
     var spy = sinon.spy();
     fileReader.read.yields(null, {
-      file : {},
       html : '<html/>',
       v    : 42
     });
@@ -164,7 +162,6 @@ test('template-reader', {
   'merges template and item-reader results': function () {
     var spy = sinon.spy();
     fileReader.read.yields(null, {
-      file : {},
       html : '<html/>',
       v1   : 1
     });
@@ -187,7 +184,7 @@ test('template-reader', {
 
   'yields empty partials and json objects if no template found': function () {
     var spy = sinon.spy();
-    fileReader.read.yields(null, { file : {} });
+    fileReader.read.yields(null, {});
     fs.exists.yields(false);
 
     templateReader.read('foo', {}, spy);
@@ -202,7 +199,7 @@ test('template-reader', {
 
   'yields parent template if no template found': function () {
     var spy = sinon.spy();
-    fileReader.read.yields(null, { file : {} });
+    fileReader.read.yields(null, {});
     fs.exists.yields(false);
 
     templateReader.read('foo', {

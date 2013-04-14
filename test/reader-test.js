@@ -13,6 +13,7 @@ var sinon          = require('sinon');
 
 var reader         = require('../lib/reader');
 var merger         = require('../lib/merger');
+var resolver       = require('../lib/resolver');
 var templateReader = require('../lib/template-reader');
 var itemReader     = require('../lib/item-reader');
 var folderReader   = require('../lib/folder-reader');
@@ -183,6 +184,28 @@ test('reader', {
     sinon.assert.calledOnce(merger.apply);
     sinon.assert.calledWith(merger.apply,
       [sinon.match.has('html', '<blockquote/>')], template.json);
+  }),
+
+
+  'uses resolver with merged data': sinon.test(function () {
+    this.stub(resolver, 'resolve');
+    var items    = [{ heading : 'First' }, { heading : 'Second' }];
+    var template = { json : { file : { name : '{heading}' } } };
+    templateReader.read.yields(null, template);
+    itemReader.read.yields(null, items);
+    folderReader.readFolders.yields(null, []);
+
+    reader.read('x', {}, {}, function () {});
+
+    sinon.assert.calledTwice(resolver.resolve);
+    sinon.assert.calledWith(resolver.resolve, {
+      file    : { name : '{heading}' },
+      heading : 'First'
+    });
+    sinon.assert.calledWith(resolver.resolve, {
+      file    : { name : '{heading}' },
+      heading : 'Second'
+    });
   })
 
 });

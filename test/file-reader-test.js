@@ -288,6 +288,44 @@ test('file-reader', {
     });
 
     assert.equal(item.file.root, '.');
+  },
+
+
+  'does not add "file" if context is null': function () {
+    fs.exists.withArgs('a/test.json').yields(true);
+    fs.readFile.withArgs('a/test.json').yields(null, new Buffer('{}'));
+    var item;
+
+    fileReader.read('a/test', null, function (err, result) {
+      item = result;
+    });
+
+    assert.strictEqual(item.file, undefined);
+  },
+
+  'adds file.name property on prototype': function () {
+    fs.exists.withArgs('a/test.json').yields(true);
+    fs.readFile.withArgs('a/test.json').yields(null, new Buffer('{}'));
+    var item;
+
+    fileReader.read('a/test', {}, function (err, result) {
+      item = result;
+    });
+
+    assert(!item.file.hasOwnProperty('name'));
+  },
+
+  'overrides file.name on object directly': function () {
+    fs.exists.withArgs('a/test.json').yields(true);
+    fs.readFile.withArgs('a/test.json').yields(null,
+        new Buffer('{"file":{"name":"foo"}}'));
+    var item;
+
+    fileReader.read('a/test', {}, function (err, result) {
+      item = result;
+    });
+
+    assert(item.file.hasOwnProperty('name'));
   }
 
 });

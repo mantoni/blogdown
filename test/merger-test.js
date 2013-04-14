@@ -62,6 +62,15 @@ test('template-merger', {
     merger.apply(this.items, { q : 42 });
 
     assert.deepEqual(this.items, [{ q : 1 }, { q : 2 }]);
+  },
+
+
+  'recurses deeply into objects': function () {
+    var item = { file : {} };
+
+    merger.apply(item, { file : { name : 'foo' } });
+
+    assert.deepEqual(item, { file : { name : 'foo' } });
   }
 
 });
