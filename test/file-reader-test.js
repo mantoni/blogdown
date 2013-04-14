@@ -157,7 +157,7 @@ test('file-reader', {
   },
 
 
-  'does not replace existing name property and uses it in path': function () {
+  'allows to define a custom name to be used in the path': function () {
     fs.exists.withArgs('some/test.json').yields(true);
     fs.readFile.withArgs('some/test.json').yields(null,
         new Buffer('{"file":{"name":"custom-name"}}'));
@@ -170,6 +170,24 @@ test('file-reader', {
       file   : {
         name : 'custom-name',
         path : 'some/custom-name.html'
+      }
+    });
+  },
+
+
+  'allows to define a custom suffix to be used in the path': function () {
+    fs.exists.withArgs('some/test.json').yields(true);
+    fs.readFile.withArgs('some/test.json').yields(null,
+        new Buffer('{"file":{"suffix":"rss"}}'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      file   : {
+        name : 'test',
+        path : 'some/test.rss'
       }
     });
   },
