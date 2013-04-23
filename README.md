@@ -94,9 +94,9 @@ The model of each item that is passed to Mustache for rendering looks like this:
 {
   // File related meta information:
   file         : {
-    path       : 'path/to/file', // without extension
-    name       : 'file',         //     -- " --
-    root       : '../..',        // relative path to root dir
+    path       : 'path/to/file.html',
+    name       : 'file',  // without the extension
+    root       : '../..', // relative path to root dir
     created    : '2013-03-17T22:01:53+01:00',
     modified   : '2013-03-17T22:01:53+01:00',
     active     : true // if this file is currently rendered, otherwise false
