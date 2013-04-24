@@ -2,6 +2,8 @@
 
 Generate HTML with [Mustache](http://mustache.github.com) and [Markdown](http://daringfireball.net/projects/markdown/syntax)
 
+[Read the blog post](http://maxantoni.de/blog/2013/04/create-project-sites-with-markdown.html).
+
 ## Goals
 
  - Provide an easy way to combine Mustache templates with Markdown.
@@ -12,7 +14,7 @@ Generate HTML with [Mustache](http://mustache.github.com) and [Markdown](http://
 
 ## Current Status
 
-In development. Feedback, issues and pull requests welcome.
+Good enough to give it a shot. Feedback, issues and pull requests welcome.
 
 ## Install
 
