@@ -4,6 +4,9 @@
 
 - Drafts: New files have timetamps set to 'DRAFT' initially. Once blogdown gets
   invoked with `--publish` the timestamps are set to that moment.
+- A global `publish` flag is available to all files which allows to exclude
+  some things from rendering when testing the site locally (e.g. analytics
+  scripts)
 - Always generate all the output files and compare them with what already
   exists in the target directory. This makes `--force` obsolete, hence it was
   removed.
