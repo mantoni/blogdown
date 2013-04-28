@@ -54,6 +54,22 @@ test('file-reader', {
   },
 
 
+  'replaces backslashes and newlines at end of JSON file before parsing':
+    function () {
+      fs.exists.withArgs('some/test.json').yields(true);
+      fs.readFile.withArgs('some/test.json').yields(null,
+        new Buffer('{"some":"long, wrapped\n    and indented json"}'));
+      var spy = sinon.spy();
+
+      fileReader.read('some/test', {}, spy);
+
+      sinon.assert.calledOnce(spy);
+      sinon.assert.calledWithMatch(spy, null, {
+        some : 'long, wrapped and indented json'
+      });
+    },
+
+
   'reads and returns parsed markdown in a json object': function () {
     fs.exists.withArgs('some/test.md').yields(true);
     fs.readFile.withArgs('some/test.md').yields(null,
