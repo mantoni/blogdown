@@ -245,6 +245,7 @@ test('blogdown', {
     });
     renderer.render.returns([]);
     writer.write.yields();
+    this.options.meta = { publish : true };
 
     blogdown('source', 'target', this.options, function () {});
 
@@ -258,7 +259,7 @@ test('blogdown', {
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
     writer.write.yields();
-    this.options.meta = { file : 'other.meta' };
+    this.options.meta = { file : 'other.meta', publish : true };
 
     blogdown('source', 'target', this.options, function () {});
 
@@ -272,6 +273,7 @@ test('blogdown', {
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
     writer.write.yields();
+    this.options.meta = { publish : true };
     var spy = sinon.spy();
 
     blogdown('source', 'target', this.options, spy);
@@ -280,6 +282,20 @@ test('blogdown', {
 
     meta.persist.invokeCallback();
 
+    sinon.assert.calledOnce(spy);
+  },
+
+
+  'yields without persisting if publish is false': function () {
+    reader.read.yields(null, { items : [] });
+    meta.update.yields(null, EMPTY_META_RESULT);
+    renderer.render.returns([]);
+    writer.write.yields();
+    var spy = sinon.spy();
+
+    blogdown('source', 'target', this.options, spy);
+
+    sinon.assert.notCalled(meta.persist);
     sinon.assert.calledOnce(spy);
   },
 

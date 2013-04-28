@@ -7,6 +7,7 @@
 - A global `publish` flag is available to all files which allows to exclude
   some things from rendering when testing the site locally (e.g. analytics
   scripts)
+- Only writing the meta file when called with `--publish`
 - Always generate all the output files and compare them with what already
   exists in the target directory. This makes `--force` obsolete, hence it was
   removed.

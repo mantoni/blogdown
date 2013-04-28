@@ -104,6 +104,9 @@ The model of each item that is passed to Mustache for rendering looks like this:
     active     : true // if this file is currently rendered, otherwise false
   },
 
+  // True if blogdown was called with --publish, otherwise false
+  publish      : true,
+
   // Markdown:
   md           : '<p>parsed from markdown</p>',
 
