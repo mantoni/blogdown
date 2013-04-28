@@ -47,6 +47,25 @@ test('processor', {
   },
 
 
+  'adds DRAFT for files that are marked as DRAFT': function () {
+    this.item.file.created  = 'DRAFT';
+
+    processor.process([this.item], '', {
+      dates      : {
+        fullDate : 'MMMM Do YYYY',
+        someTime : 'HH:mm:ss'
+      }
+    });
+
+    assert.equal(this.item.dates.fullDate.created, 'DRAFT');
+    assert.equal(this.item.dates.fullDate.modified, 'DRAFT');
+    assert.equal(this.item.dates.fullDate.rendered, 'DRAFT');
+    assert.equal(this.item.dates.someTime.created, 'DRAFT');
+    assert.equal(this.item.dates.someTime.modified, 'DRAFT');
+    assert.equal(this.item.dates.someTime.rendered, 'DRAFT');
+  },
+
+
   'does not add timestamps if file timestamps do not exist': function () {
     processor.process([this.item], '', {
       dates      : {

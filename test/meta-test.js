@@ -15,18 +15,19 @@ var fs     = require('fs');
 
 var meta   = require('../lib/meta');
 
-function invoke(items) {
+function invoke(items, publish) {
   var json;
-  meta.update(items, { target : 'some/target' }, function (err, result) {
-    json = result;
-  });
+  meta.update(items, { target : 'some/target', publish : publish },
+    function (err, result) {
+      json = result;
+    });
   return json;
 }
 
-function create(item) {
+function create(item, publish) {
   fs.exists.yields(false);
   item.file = { path : 'x' };
-  return invoke([item]).meta.x;
+  return invoke([item], publish).meta.x;
 }
 
 
@@ -39,7 +40,7 @@ function setFileContent(json) {
 function update(persistedData, item) {
   setFileContent({ x : persistedData });
   item.file = { path : 'x' };
-  return invoke([item]).meta.x;
+  return invoke([item], true).meta.x;
 }
 
 
@@ -129,26 +130,46 @@ test('meta update', {
   },
 
 
-  'adds missing entry': function () {
+  'adds missing entry if publishing': function () {
     setFileContent({ 'existing/item': {} });
 
-    var json = invoke([{ file : { path : 'new/item' } }]);
+    var json = invoke([{ file : { path : 'new/item' } }], true);
 
     assert(json.meta.hasOwnProperty('new/item'));
   },
 
 
-  'sets created, modified and rendered timestamp for new file': function () {
-    var item = {};
-    var json = create(item);
+  'does not add missing entry if not publishing': function () {
+    setFileContent({ 'existing/item': {} });
 
-    assert.equal(json.created, '1970-01-01T01:00:00+01:00');
-    assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
-    assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
-    assert.equal(item.file.created, '1970-01-01T01:00:00+01:00');
-    assert.equal(item.file.modified, '1970-01-01T01:00:00+01:00');
-    assert.equal(item.file.rendered, '1970-01-01T01:00:00+01:00');
+    var json = invoke([{ file : { path : 'new/item' } }], false);
+
+    assert(!json.meta.hasOwnProperty('new/item'));
   },
+
+
+  'sets created, modified and rendered timestamp for draft': function () {
+    var item = {};
+    create(item, false);
+
+    assert.equal(item.file.created, 'DRAFT');
+    assert.equal(item.file.modified, 'DRAFT');
+    assert.equal(item.file.rendered, 'DRAFT');
+  },
+
+
+  'sets created, modified and rendered timestamp for new published file':
+    function () {
+      var item = {};
+      var json = create(item, true);
+
+      assert.equal(json.created, '1970-01-01T01:00:00+01:00');
+      assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
+      assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
+      assert.equal(item.file.created, '1970-01-01T01:00:00+01:00');
+      assert.equal(item.file.modified, '1970-01-01T01:00:00+01:00');
+      assert.equal(item.file.rendered, '1970-01-01T01:00:00+01:00');
+    },
 
 
   'leaves created but updates modified and rendered for updated file':
@@ -170,14 +191,14 @@ test('meta update', {
 
 
   'generates empty content sha': function () {
-    var json = create({});
+    var json = create({}, true);
 
     assert.equal(json.content, SHA_EMPTY_CONTENT);
   },
 
 
   'generates empty html sha': function () {
-    var json = create({});
+    var json = create({}, true);
 
     assert.equal(json.html, SHA_EMPTY_HTML);
   },

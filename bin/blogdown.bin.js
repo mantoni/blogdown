@@ -24,6 +24,12 @@ options.read('blogdown', function (err, options) {
   if (argv.f || argv.force) {
     options.force = true;
   }
+  if (argv.publish) {
+    if (!options.meta) {
+      options.meta = {};
+    }
+    options.meta.publish = true;
+  }
 
   var time = Date.now();
   blogdown('src', 'site', options, function (err, stats) {
