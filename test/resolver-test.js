@@ -64,6 +64,36 @@ test('resolver', {
   },
 
 
+  'removes dots from resolved file name': function () {
+    var item = {
+      file    : { name : '{resolve}' },
+      resolve : 'res.olved.'
+    };
+
+    resolver.resolve(item);
+
+    assert.equal(item.file.name, 'resolved');
+  },
+
+
+  'does not remove dots from file name that where not resolved': function () {
+    var item = { file : { name : 'my.js.html' } };
+
+    resolver.resolve(item);
+
+    assert.equal(item.file.name, 'my.js.html');
+  },
+
+
+  'does not lower case file names that where not resolved': function () {
+    var item = { file : { name : 'MyOther.html' } };
+
+    resolver.resolve(item);
+
+    assert.equal(item.file.name, 'MyOther.html');
+  },
+
+
   'does not change html': function () {
     var item = { html : '<pre>{{example}}</pre>' };
 
