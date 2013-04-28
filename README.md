@@ -19,7 +19,7 @@ Good enough to give it a shot. Feedback, issues and pull requests welcome.
 ## Install
 
 ```
-npm install -g blogdown
+$ npm install -g blogdown
 ```
 
 ## Get Started
@@ -125,23 +125,12 @@ The model of each item that is passed to Mustache for rendering looks like this:
 
 ## Command line options
 
-While developing a website with blogdown, you might want to force re-rendering
-of all pages if a mustache partial changed. Use `--force` (or `-f`) for that.
-
 To get more information about which templates and items where found and which
 properties they contained, use `--debug` (or `-d`).
 
 ```
-# Force write all files:
-blogdown --force
-blogdown -f
-
-# Print debug info:
-blogdown --debug
-blogdown -d
-
-# Combined:
-blogdown -df
+$ blogdown --debug
+$ blogdown -d
 ```
 
 ## Credits

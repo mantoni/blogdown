@@ -39,27 +39,6 @@ var createMetaWithCreated = function (items) {
   };
 };
 
-var createMetaWithModified = function (items) {
-  return {
-    created : [],
-    updated : items,
-    missing : [],
-    deleted : [],
-    meta    : {}
-  };
-};
-
-
-var createMetaWithMissing = function (items) {
-  return {
-    created : [],
-    updated : [],
-    missing : items,
-    deleted : [],
-    meta    : {}
-  };
-};
-
 
 test('blogdown', {
 
@@ -154,39 +133,11 @@ test('blogdown', {
   },
 
 
-  'renders created items after processing': function () {
+  'renders items after processing': function () {
     list.createAll.returns({});
     var item = { file : { path : 'src/foo' }, some : 'item' };
-    reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
-    meta.update.yields(null, createMetaWithCreated([item]));
-
-    blogdown('src', 'site', this.options, function () {});
-
-    sinon.assert.calledOnce(renderer.render);
-    sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
-    sinon.assert.callOrder(processor.process, renderer.render);
-  },
-
-
-  'renders modified items after processing': function () {
-    list.createAll.returns({});
-    var item = { file : { path : 'src/foo' }, some : 'item' };
-    reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
-    meta.update.yields(null, createMetaWithModified([item]));
-
-    blogdown('src', 'site', this.options, function () {});
-
-    sinon.assert.calledOnce(renderer.render);
-    sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
-    sinon.assert.callOrder(processor.process, renderer.render);
-  },
-
-
-  'renders missing items after processing': function () {
-    list.createAll.returns({});
-    var item = { file : { path : 'src/foo' }, some : 'item' };
-    reader.read.yields(null, { items : [], partials : { p : '<p/>' } });
-    meta.update.yields(null, createMetaWithMissing([item]));
+    reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
+    meta.update.yields(null, EMPTY_META_RESULT);
 
     blogdown('src', 'site', this.options, function () {});
 
@@ -215,8 +166,8 @@ test('blogdown', {
     var lists = { foo : [{ n : 1 }] };
     list.createAll.returns(lists);
     var item = { file : { path : 'src/foo' }, some : 'item' };
-    reader.read.yields(null, { items : [], partials : {} });
-    meta.update.yields(null, createMetaWithCreated([item]));
+    reader.read.yields(null, { items : [item], partials : {} });
+    meta.update.yields(null, EMPTY_META_RESULT);
 
     blogdown('src', 'site', this.options, function () {});
 

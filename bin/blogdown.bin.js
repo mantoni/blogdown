@@ -21,9 +21,6 @@ options.read('blogdown', function (err, options) {
   if (argv.d || argv.debug) {
     log.enableDebug();
   }
-  if (argv.f || argv.force) {
-    options.force = true;
-  }
   if (argv.publish) {
     if (!options.meta) {
       options.meta = {};
