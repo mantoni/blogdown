@@ -40,6 +40,19 @@ test('resolver', {
   },
 
 
+  'resolves multiple placeholders in single property': function () {
+    var item = {
+      title         : '{heading} - {sub-heading}',
+      heading       : 'Please',
+      'sub-heading' : 'Keep it DRY'
+    };
+
+    resolver.resolve(item);
+
+    assert.equal(item.title, 'Please - Keep it DRY');
+  },
+
+
   'resolves placeholder in file name': function () {
     var item = {
       file    : { name  : '{resolve}' },
