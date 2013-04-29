@@ -1,5 +1,9 @@
 # Changes
 
+## v0.6.2
+
+- Fixed `publish` flag
+
 ## v0.6.1
 
 - Links to "a/index.html" now refer to "a/"

@@ -1,6 +1,6 @@
 {
   "name"            : "blogdown",
-  "version"         : "0.6.1",
+  "version"         : "0.6.2",
   "description"     : "Generate HTML with Mustache and Markdown",
   "keywords"        : ["html", "generator", "mustache", "markdown"],
   "author"          : "Maximilian Antoni (http://maxantoni.de)",
