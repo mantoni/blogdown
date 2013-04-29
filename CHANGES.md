@@ -1,5 +1,9 @@
 # Changes
 
+## v0.6.1
+
+- Links to "a/index.html" now refer to "a/"
+
 ## v0.6.0
 
 - Drafts: New files have timetamps set to 'DRAFT' initially. Once blogdown is
