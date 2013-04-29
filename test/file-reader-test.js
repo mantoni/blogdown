@@ -210,11 +210,9 @@ test('file-reader', {
 
 
   'file.active is false by default': function () {
-    fs.exists.withArgs('some/test.json').yields(true);
-    fs.readFile.withArgs('some/test.json').yields(null, new Buffer('{}'));
-    var item, context = {};
+    var item;
 
-    fileReader.read('some/test',  context, function (err, result) {
+    fileReader.read('some/test', {}, function (err, result) {
       item = result;
     });
 
@@ -223,11 +221,9 @@ test('file-reader', {
 
 
   'file.active is true if item is equal to context.current': function () {
-    fs.exists.withArgs('some/test.json').yields(true);
-    fs.readFile.withArgs('some/test.json').yields(null, new Buffer('{}'));
     var item, context = {};
 
-    fileReader.read('some/test',  context, function (err, result) {
+    fileReader.read('some/test', context, function (err, result) {
       item = result;
     });
     context.current = item;
@@ -237,8 +233,6 @@ test('file-reader', {
 
 
   'file.path does not contain context.root portion': function () {
-    fs.exists.withArgs('a/b/test.json').yields(true);
-    fs.readFile.withArgs('a/b/test.json').yields(null, new Buffer('{}'));
     var item;
 
     fileReader.read('a/b/test', { root : 'a' }, function (err, result) {
@@ -250,14 +244,12 @@ test('file-reader', {
 
 
   'file.path is relative to current item': function () {
-    fs.exists.withArgs('a/b/test.json').yields(true);
-    fs.readFile.withArgs('a/b/test.json').yields(null, new Buffer('{}'));
     var item, context = {
       root    : 'a',
       current : { file : { path : 'c/file.html' } }
     };
 
-    fileReader.read('a/b/test',  context, function (err, result) {
+    fileReader.read('a/b/test', context, function (err, result) {
       item = result;
     });
 
@@ -266,18 +258,85 @@ test('file-reader', {
 
 
   'file.path is relative to current item in same folder': function () {
-    fs.exists.withArgs('a/b/test.json').yields(true);
-    fs.readFile.withArgs('a/b/test.json').yields(null, new Buffer('{}'));
     var item, context = {
       root    : 'a',
       current : { file : { path : 'b/file.html' } }
     };
 
-    fileReader.read('a/b/test',  context, function (err, result) {
+    fileReader.read('a/b/test', context, function (err, result) {
       item = result;
     });
 
     assert.equal(item.file.path, 'test.html');
+  },
+
+
+  'file.path removes "index.html" if rendering': function () {
+    var item;
+
+    fileReader.read('a/b/index', { root : 'a', rendering : true },
+      function (err, result) {
+        item = result;
+      });
+
+    assert.equal(item.file.path, 'b/');
+  },
+
+
+  'file.path does not remove "index.html" if not rendering': function () {
+    var item;
+
+    fileReader.read('a/b/index', { root : 'a', rendering : false },
+      function (err, result) {
+        item = result;
+      });
+
+    assert.equal(item.file.path, 'b/index.html');
+  },
+
+
+  'relative file.path from index.html is correct': function () {
+    var item, context = {
+      root      : 'a',
+      current   : { file : { path : 'c/' } },
+      rendering : true
+    };
+
+    fileReader.read('a/b/other', context, function (err, result) {
+      item = result;
+    });
+
+    assert.equal(item.file.path, '../b/other.html');
+  },
+
+
+  'relative file.path to index.html is correct': function () {
+    var item, context = {
+      root      : 'a',
+      current   : { file : { path : 'c/file.html' } },
+      rendering : true
+    };
+
+    fileReader.read('a/b/index', context, function (err, result) {
+      item = result;
+    });
+
+    assert.equal(item.file.path, '../b/');
+  },
+
+
+  'relative file.path from and to index.html is correct': function () {
+    var item, context = {
+      root      : 'a',
+      current   : { file : { path : 'c/' } },
+      rendering : true
+    };
+
+    fileReader.read('a/b/index', context, function (err, result) {
+      item = result;
+    });
+
+    assert.equal(item.file.path, '../b/');
   },
 
 
