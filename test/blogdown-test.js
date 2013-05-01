@@ -68,9 +68,7 @@ test('blogdown', {
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(reader.read);
-    sinon.assert.calledWith(reader.read, 'some/source', {
-      json : { publish : false }
-    });
+    sinon.assert.calledWith(reader.read, 'some/source', {});
   },
 
 
@@ -80,9 +78,7 @@ test('blogdown', {
     blogdown('some/source', 'some/target', this.options, function () {});
 
     sinon.assert.calledOnce(reader.read);
-    sinon.assert.calledWith(reader.read, 'some/source', {
-      json : { publish : true }
-    });
+    sinon.assert.calledWith(reader.read, 'some/source', {});
   },
 
 

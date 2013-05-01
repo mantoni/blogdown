@@ -37,10 +37,10 @@ function setFileContent(json) {
 }
 
 
-function update(persistedData, item) {
+function update(persistedData, item, publish) {
   setFileContent({ x : persistedData });
   item.file = { path : 'x' };
-  return invoke([item], true).meta.x;
+  return invoke([item], arguments.length === 2 ? true : publish).meta.x;
 }
 
 
@@ -148,6 +148,26 @@ test('meta update', {
   },
 
 
+  'sets publishg flag to true on json': function () {
+    setFileContent({ 'existing/item': {} });
+    var json = { file : { path : 'new/item' } };
+
+    invoke([json], true);
+
+    assert(json.publish);
+  },
+
+
+  'sets publish flag to false on json': function () {
+    setFileContent({ 'existing/item': {} });
+    var json = { file : { path : 'new/item' } };
+
+    invoke([json], false);
+
+    assert.strictEqual(json.publish, false);
+  },
+
+
   'sets created, modified and rendered timestamp for draft': function () {
     var item = {};
     create(item, false);
@@ -215,6 +235,15 @@ test('meta update', {
   },
 
 
+  'does not include publish flag in content sha calculation': function () {
+    var a = update({ content : SHA_EMPTY_CONTENT }, { some : 'data' }, false);
+    var b = update({ content : SHA_EMPTY_CONTENT }, { some : 'data' }, true);
+
+    assert.equal(a.content, b.content);
+  },
+
+
+
   'updates html sha': function () {
     var json = update({
       content : SHA_EMPTY_HTML
@@ -273,16 +302,6 @@ test('meta update', {
 
     assert.equal(json.modified, 'modified');
     assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
-  },
-
-
-  'does not take the "publish" flag into account': function () {
-    var a = update({}, { publish : false });
-    var b = update({}, { publish : true });
-    var c = update({}, {});
-
-    assert.equal(a.content, b.content);
-    assert.equal(a.content, c.content);
   },
 
 
