@@ -3,6 +3,7 @@
 ## v0.6.2
 
 - Fixed `publish` flag
+- Not including `publish` flag in content sha
 
 ## v0.6.1
 

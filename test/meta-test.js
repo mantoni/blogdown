@@ -276,6 +276,15 @@ test('meta update', {
   },
 
 
+  'does not take the "publish" flag into account': function () {
+    var a = update({}, { publish : false });
+    var b = update({}, { publish : true });
+    var c = update({}, {});
+
+    assert.equal(a.content, b.content);
+    assert.equal(a.content, c.content);
+  },
+
 
   'yields new item as created': function () {
     setFileContent({
