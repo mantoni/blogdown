@@ -1,5 +1,9 @@
 # Changes
 
+## v0.7.0
+
+- Write JSON at the top of Markdown and HTML files
+
 ## v0.6.2
 
 - Fixed `publish` flag

@@ -401,6 +401,64 @@ test('file-reader', {
     });
 
     assert(item.file.hasOwnProperty('name'));
+  },
+
+  'reads multiline json at top of markdown': function () {
+    fs.exists.withArgs('some/test.md').yields(true);
+    fs.readFile.withArgs('some/test.md').yields(null,
+        new Buffer('{\n  "some": "json"\n}\n\n_markdown_'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      md   : '<p><em>markdown</em></p>',
+      some : 'json'
+    });
+  },
+
+  'igores json in markdown if not on first line': function () {
+    fs.exists.withArgs('some/test.md').yields(true);
+    fs.readFile.withArgs('some/test.md').yields(null,
+        new Buffer('\n{\n  "some": "json"\n}\n'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      md : '<p>{\n  &quot;some&quot;: &quot;json&quot;\n}</p>'
+    });
+  },
+
+  'reads multiline json at top of html': function () {
+    fs.exists.withArgs('some/test.html').yields(true);
+    fs.readFile.withArgs('some/test.html').yields(null,
+        new Buffer('{\n  "some": "json"\n}\n\n<em>html</em>'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      html : '<em>html</em>',
+      some : 'json'
+    });
+  },
+
+  'igores json in html if not on first line': function () {
+    fs.exists.withArgs('some/test.html').yields(true);
+    fs.readFile.withArgs('some/test.html').yields(null,
+        new Buffer('<pre>\n{\n  "some": "json"\n}\n</pre>'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      html : '<pre>\n{\n  "some": "json"\n}\n</pre>'
+    });
   }
 
 });
