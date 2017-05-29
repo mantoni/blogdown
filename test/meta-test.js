@@ -15,6 +15,9 @@ var fs     = require('fs');
 
 var meta   = require('../lib/meta');
 
+var timezoneOffSet = -1 * (new Date()).getTimezoneOffset() / 60;
+var epocCurrentTZString = '1970-01-01T'+timezoneOffSet+':00:00+'+timezoneOffSet+':00';
+
 function invoke(items, publish) {
   var json;
   meta.update(items, { target : 'some/target', publish : publish },
@@ -183,12 +186,12 @@ test('meta update', {
       var item = {};
       var json = create(item, true);
 
-      assert.equal(json.created, '1970-01-01T01:00:00+01:00');
-      assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
-      assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
-      assert.equal(item.file.created, '1970-01-01T01:00:00+01:00');
-      assert.equal(item.file.modified, '1970-01-01T01:00:00+01:00');
-      assert.equal(item.file.rendered, '1970-01-01T01:00:00+01:00');
+      assert.equal(json.created, epocCurrentTZString);
+      assert.equal(json.modified, epocCurrentTZString);
+      assert.equal(json.rendered, epocCurrentTZString);
+      assert.equal(item.file.created, epocCurrentTZString);
+      assert.equal(item.file.modified, epocCurrentTZString);
+      assert.equal(item.file.rendered, epocCurrentTZString);
     },
 
 
@@ -202,11 +205,11 @@ test('meta update', {
       }, item);
 
       assert.equal(json.created, 'created');
-      assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
-      assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
+      assert.equal(json.modified, epocCurrentTZString);
+      assert.equal(json.rendered, epocCurrentTZString);
       assert.equal(item.file.created, 'created');
-      assert.equal(item.file.modified, '1970-01-01T01:00:00+01:00');
-      assert.equal(item.file.rendered, '1970-01-01T01:00:00+01:00');
+      assert.equal(item.file.modified, epocCurrentTZString);
+      assert.equal(item.file.rendered, epocCurrentTZString);
     },
 
 
@@ -287,8 +290,8 @@ test('meta update', {
       content  : SHA_DEFAULT_CONTENT
     }, { some : 'change' });
 
-    assert.equal(json.modified, '1970-01-01T01:00:00+01:00');
-    assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
+    assert.equal(json.modified, epocCurrentTZString);
+    assert.equal(json.rendered, epocCurrentTZString);
   },
 
 
@@ -301,7 +304,7 @@ test('meta update', {
     }, { html : '<change/>' });
 
     assert.equal(json.modified, 'modified');
-    assert.equal(json.rendered, '1970-01-01T01:00:00+01:00');
+    assert.equal(json.rendered, epocCurrentTZString);
   },
 
 
