@@ -1,19 +1,19 @@
 # Changes
 
-## v0.7.0
+## 0.7.0
 
 - Write JSON at the top of Markdown and HTML files
 
-## v0.6.2
+## 0.6.2
 
 - Fixed `publish` flag
 - Not including `publish` flag in content sha
 
-## v0.6.1
+## 0.6.1
 
 - Links to "a/index.html" now refer to "a/"
 
-## v0.6.0
+## 0.6.0
 
 - Drafts: New files have timetamps set to 'DRAFT' initially. Once blogdown is
   invoked with `--publish` the actual timestamps are set.
@@ -23,7 +23,7 @@
   exists in the target directory. This made `--force` obsolete.
 - JSON: Support newlines and indentation in strings:
 
-```
+```json
 {
   "description" : "Sometimes 80 characters are just too narrow, and
                    horizontal scrolling sucks"
