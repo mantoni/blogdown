@@ -9,7 +9,7 @@
     "markdown",
     "blog"
   ],
-  "author": "Maximilian Antoni (http://maxantoni.de)",
+  "author": "Maximilian Antoni <mail@maxantoni.de> (http://maxantoni.de)",
   "homepage": "http://github.com/mantoni/blogdown",
   "main": "./lib/blogdown.js",
   "bin": "bin/blogdown.bin.js",
