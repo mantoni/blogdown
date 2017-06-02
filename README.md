@@ -38,7 +38,9 @@ $ npm install -g blogdown
 ## Config file
 
 Global configs are stored in a `blogdown.json` file in the root of your project.
-The file defines date formats and lists of files.
+The file defines date formats and lists of files, as well as any custom properties you want to define that will be made available to all mustache templates under the "blogdown." object namespace.
+
+A custom output folder can also be specificed here using the `siteDir` property.
 
 ## Date formats
 
@@ -122,6 +124,9 @@ The model of each item that is passed to Mustache for rendering looks like this:
   newArticles  : [{ ... }, { ... }],
   coolProjects : [{ ... }, { ... }],
 
+  // And any other properties in "blogdown.json" are available
+  blogdown.anyProperty : 'defined in blogdown.json'
+
   anyProperty  : 'defined in a .json file'
 }
 ```
@@ -143,4 +148,3 @@ This project was build on top of the hard work of other people:
  - https://github.com/chjj/marked
  - https://github.com/janl/mustache.js
  - https://github.com/timrwood/moment
-
