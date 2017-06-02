@@ -44,5 +44,6 @@
     "README.md",
     "CHANGES.md",
     "LICENSE"
-  ]
+  ],
+  "license": "MIT"
 }
