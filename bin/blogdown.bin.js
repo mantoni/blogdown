@@ -29,7 +29,7 @@ options.read('blogdown', function (err, options) {
   }
 
   var time = Date.now();
-  blogdown('src', 'site', options, function (err, stats) {
+  blogdown('src', (options.siteDir || 'site'), options, function (err, stats) {
     if (err) {
       if (err.errors) {
         console.error(err.toString());
