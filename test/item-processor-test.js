@@ -44,9 +44,12 @@ test('processor', {
     assert.equal(this.item.dates.fullDate.modified, 'January 2nd 1970');
     assert.equal(this.item.dates.fullDate.rendered, 'January 3rd 1970');
     // zero-pad, ref: https://groups.google.com/forum/#!topic/nodejs/df5UzXFAByA
-    assert.equal(this.item.dates.someTime.created, ("0" + timezoneOffSet).slice(-2)+':00:00');
-    assert.equal(this.item.dates.someTime.modified, ("0" + (timezoneOffSet+1)).slice(-2) +':00:00');
-    assert.equal(this.item.dates.someTime.rendered, ("0" + (timezoneOffSet+2)).slice(-2)+':00:00');
+    assert.equal(this.item.dates.someTime.created,
+        ('0' + timezoneOffSet).slice(-2) + ':00:00');
+    assert.equal(this.item.dates.someTime.modified,
+        ('0' + (timezoneOffSet + 1)).slice(-2) + ':00:00');
+    assert.equal(this.item.dates.someTime.rendered,
+        ('0' + (timezoneOffSet + 2)).slice(-2) + ':00:00');
   },
 
 
