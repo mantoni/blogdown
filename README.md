@@ -1,5 +1,9 @@
 # Blogdown
 
+[![Build Status]](https://travis-ci.org/mantoni/blogdown)
+[![SemVer]](http://semver.org)
+[![License]](https://github.com/mantoni/mochify.js/blob/master/LICENSE)
+
 Generate HTML with [Mustache](http://mustache.github.com) and [Markdown](http://daringfireball.net/projects/markdown/syntax)
 
 [Read the blog post](http://maxantoni.de/blog/2013/04/create-project-sites-with-markdown.html).
@@ -148,3 +152,7 @@ This project was build on top of the hard work of other people:
  - https://github.com/chjj/marked
  - https://github.com/janl/mustache.js
  - https://github.com/timrwood/moment
+
+[Build Status]: http://img.shields.io/travis/mantoni/blogdown.svg
+[SemVer]: http://img.shields.io/:semver-%E2%9C%93-brightgreen.svg
+[License]: http://img.shields.io/npm/l/blogdown.svg
