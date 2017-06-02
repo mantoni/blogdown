@@ -10,6 +10,9 @@
     "blog"
   ],
   "author": "Maximilian Antoni <mail@maxantoni.de> (http://maxantoni.de)",
+  "contributors": [
+    "Maksim Lin <maks@manichord.com>"
+  ],
   "homepage": "http://github.com/mantoni/blogdown",
   "main": "./lib/blogdown.js",
   "bin": "bin/blogdown.bin.js",
