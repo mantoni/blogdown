@@ -16,7 +16,7 @@ var fs = require('fs');
 var meta = require('../lib/meta');
 
 var timezoneOffSet = -1 * (new Date()).getTimezoneOffset() / 60;
-var epocCurrentTZString = '1970-01-01T'+timezoneOffSet+':00:00+'+timezoneOffSet+':00';
+var epocCurrentTZString = '1970-01-01T'+("0" + timezoneOffSet).slice(-2)+':00:00+'+timezoneOffSet+':00';
 
 function invoke(items, publish) {
   var json;
