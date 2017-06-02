@@ -17,7 +17,9 @@
     "node": ">=0.8"
   },
   "scripts": {
-    "test": "make"
+    "lint": "eslint .",
+    "test": "make",
+    "posttest": "npm run lint"
   },
   "repository": {
     "type": "git",
@@ -31,10 +33,10 @@
     "optimist": "~0.3.7"
   },
   "devDependencies": {
-    "utest": "~0.0.6",
-    "urun": "~0.0.6",
+    "eslint": "^3.19.0",
     "sinon": "~1.6.0",
-    "autolint": "~1.1.3"
+    "urun": "~0.0.6",
+    "utest": "~0.0.6"
   },
   "files": [
     "bin",

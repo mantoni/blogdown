@@ -7,11 +7,11 @@
  */
 'use strict';
 
-var test       = require('utest');
-var assert     = require('assert');
-var sinon      = require('sinon');
+var test = require('utest');
+var assert = require('assert');
+var sinon = require('sinon');
 
-var fs         = require('fs');
+var fs = require('fs');
 var fileReader = require('../lib/file-reader');
 
 
@@ -213,6 +213,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('some/test', {}, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -224,6 +225,7 @@ test('file-reader', {
     var item, context = {};
 
     fileReader.read('some/test', context, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
     context.current = item;
@@ -236,6 +238,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('a/b/test', { root : 'a' }, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -244,12 +247,14 @@ test('file-reader', {
 
 
   'file.path is relative to current item': function () {
-    var item, context = {
+    var item;
+    var context = {
       root    : 'a',
       current : { file : { path : 'c/file.html' } }
     };
 
     fileReader.read('a/b/test', context, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -258,12 +263,14 @@ test('file-reader', {
 
 
   'file.path is relative to current item in same folder': function () {
-    var item, context = {
+    var item;
+    var context = {
       root    : 'a',
       current : { file : { path : 'b/file.html' } }
     };
 
     fileReader.read('a/b/test', context, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -276,6 +283,7 @@ test('file-reader', {
 
     fileReader.read('a/b/index', { root : 'a', rendering : true },
       function (err, result) {
+        assert.ifError(err);
         item = result;
       });
 
@@ -288,6 +296,7 @@ test('file-reader', {
 
     fileReader.read('a/b/index', { root : 'a', rendering : false },
       function (err, result) {
+        assert.ifError(err);
         item = result;
       });
 
@@ -296,13 +305,15 @@ test('file-reader', {
 
 
   'relative file.path from index.html is correct': function () {
-    var item, context = {
+    var item;
+    var context = {
       root      : 'a',
       current   : { file : { path : 'c/' } },
       rendering : true
     };
 
     fileReader.read('a/b/other', context, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -311,13 +322,15 @@ test('file-reader', {
 
 
   'relative file.path to index.html is correct': function () {
-    var item, context = {
+    var item;
+    var context = {
       root      : 'a',
       current   : { file : { path : 'c/file.html' } },
       rendering : true
     };
 
     fileReader.read('a/b/index', context, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -326,13 +339,15 @@ test('file-reader', {
 
 
   'relative file.path from and to index.html is correct': function () {
-    var item, context = {
+    var item;
+    var context = {
       root      : 'a',
       current   : { file : { path : 'c/' } },
       rendering : true
     };
 
     fileReader.read('a/b/index', context, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -346,6 +361,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('a/b/c/test', { root : 'a' }, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -359,6 +375,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('a/test', { root : 'a' }, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -372,6 +389,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('a/test', null, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -384,6 +402,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('a/test', {}, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 
@@ -397,6 +416,7 @@ test('file-reader', {
     var item;
 
     fileReader.read('a/test', {}, function (err, result) {
+      assert.ifError(err);
       item = result;
     });
 

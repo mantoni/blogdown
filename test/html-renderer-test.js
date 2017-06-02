@@ -7,9 +7,9 @@
  */
 'use strict';
 
-var test     = require('utest');
-var assert   = require('assert');
-var sinon    = require('sinon');
+var test = require('utest');
+var assert = require('assert');
+var sinon = require('sinon');
 
 var mustache = require('mustache');
 var renderer = require('../lib/html-renderer');

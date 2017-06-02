@@ -7,11 +7,10 @@
  */
 'use strict';
 
-var test   = require('utest');
-var assert = require('assert');
-var sinon  = require('sinon');
+var test = require('utest');
+var sinon = require('sinon');
 
-var fs     = require('fs');
+var fs = require('fs');
 var writer = require('../lib/file-writer');
 
 

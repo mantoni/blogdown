@@ -7,12 +7,12 @@
  */
 'use strict';
 
-var test       = require('utest');
-var assert     = require('assert');
-var sinon      = require('sinon');
+var test = require('utest');
+var assert = require('assert');
+var sinon = require('sinon');
 
-var fs         = require('fs');
-var processor  = require('../lib/item-processor');
+var fs = require('fs');
+var processor = require('../lib/item-processor');
 
 
 test('processor', {

@@ -6,10 +6,12 @@
  *
  * @license MIT
  */
-var log      = require('../lib/log');
-var options  = require('../lib/options');
+'use strict';
+
+var log = require('../lib/log');
+var options = require('../lib/options');
 var blogdown = require('../lib/blogdown');
-var argv     = require('optimist').argv;
+var argv = require('optimist').argv;
 
 
 options.read('blogdown', function (err, options) {

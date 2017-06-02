@@ -7,17 +7,15 @@
  */
 'use strict';
 
-var test           = require('utest');
-var assert         = require('assert');
-var sinon          = require('sinon');
+var test = require('utest');
+var sinon = require('sinon');
 
-var reader         = require('../lib/reader');
-var merger         = require('../lib/merger');
-var resolver       = require('../lib/resolver');
+var reader = require('../lib/reader');
+var merger = require('../lib/merger');
+var resolver = require('../lib/resolver');
 var templateReader = require('../lib/template-reader');
-var itemReader     = require('../lib/item-reader');
-var folderReader   = require('../lib/folder-reader');
-var fileReader     = require('../lib/file-reader');
+var itemReader = require('../lib/item-reader');
+var folderReader = require('../lib/folder-reader');
 
 
 test('reader', {

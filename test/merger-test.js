@@ -7,9 +7,8 @@
  */
 'use strict';
 
-var test   = require('utest');
+var test = require('utest');
 var assert = require('assert');
-var sinon  = require('sinon');
 
 var merger = require('../lib/merger');
 

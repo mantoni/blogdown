@@ -7,13 +7,13 @@
  */
 'use strict';
 
-var test   = require('utest');
+var test = require('utest');
 var assert = require('assert');
-var sinon  = require('sinon');
+var sinon = require('sinon');
 
-var fs     = require('fs');
+var fs = require('fs');
 
-var meta   = require('../lib/meta');
+var meta = require('../lib/meta');
 
 var timezoneOffSet = -1 * (new Date()).getTimezoneOffset() / 60;
 var epocCurrentTZString = '1970-01-01T'+timezoneOffSet+':00:00+'+timezoneOffSet+':00';
@@ -22,6 +22,7 @@ function invoke(items, publish) {
   var json;
   meta.update(items, { target : 'some/target', publish : publish },
     function (err, result) {
+      assert.ifError(err);
       json = result;
     });
   return json;
@@ -51,8 +52,6 @@ var SHA_EMPTY_HTML      = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391';
 var SHA_EMPTY_CONTENT   = '9e26dfeeb6e641a33dae4961196235bdb965b21b';
 var SHA_DEFAULT_HTML    = '58b78820701d32dac4450754e291bb6cf19c6e46';
 var SHA_DEFAULT_CONTENT = '2801f6fa981c15818a1a7654abca07b5d4d731bc';
-var SHA_UPDATED_HTML    = '';
-var SHA_UPDATED_CONTENT = '';
 
 
 test('meta update', {
@@ -244,7 +243,6 @@ test('meta update', {
 
     assert.equal(a.content, b.content);
   },
-
 
 
   'updates html sha': function () {
