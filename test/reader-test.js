@@ -17,19 +17,19 @@ var templateReader = require('../lib/template-reader');
 var itemReader = require('../lib/item-reader');
 var folderReader = require('../lib/folder-reader');
 
+var sandbox;
 
 test('reader', {
 
   before: function () {
-    sinon.stub(templateReader, 'read');
-    sinon.stub(itemReader, 'read');
-    sinon.stub(folderReader, 'readFolders');
+    sandbox = sinon.sandbox.create();
+    sandbox.stub(templateReader, 'read');
+    sandbox.stub(itemReader, 'read');
+    sandbox.stub(folderReader, 'readFolders');
   },
 
   after: function () {
-    templateReader.read.restore();
-    itemReader.read.restore();
-    folderReader.readFolders.restore();
+    sandbox.restore();
   },
 
 
@@ -54,10 +54,10 @@ test('reader', {
   },
 
 
-  'invokes read recursively for each folder': sinon.test(function () {
+  'invokes read recursively for each folder': function () {
     templateReader.read.yields(null, {});
     itemReader.read.yields(null, []);
-    this.spy(reader, 'read');
+    sandbox.spy(reader, 'read');
 
     reader.read('x/y', {}, {}, function () {});
     folderReader.readFolders.firstCall.invokeCallback(null, ['a', 'b']);
@@ -65,20 +65,18 @@ test('reader', {
     sinon.assert.calledThrice(reader.read);
     sinon.assert.calledWith(reader.read, 'x/y/a');
     sinon.assert.calledWith(reader.read, 'x/y/b');
-  }),
+  },
 
 
-  'does not invoke read recursively for template folder': sinon.test(
-    function () {
-      templateReader.read.yields(null, {});
-      folderReader.readFolders.yields(null, ['template']);
-      this.spy(reader, 'read');
+  'does not invoke read recursively for template folder': function () {
+    templateReader.read.yields(null, {});
+    folderReader.readFolders.yields(null, ['template']);
+    sandbox.spy(reader, 'read');
 
-      reader.read('x/y', {}, {}, function () {});
+    reader.read('x/y', {}, {}, function () {});
 
-      sinon.assert.calledOnce(reader.read);
-    }
-  ),
+    sinon.assert.calledOnce(reader.read);
+  },
 
 
   'yields item reader results': function () {
@@ -154,8 +152,8 @@ test('reader', {
   },
 
 
-  'merges template result into items': sinon.test(function () {
-    this.stub(merger, 'apply');
+  'merges template result into items': function () {
+    sandbox.stub(merger, 'apply');
     var items    = [{}, { v : 42 }];
     var template = { json : { html : '<html/>', some : 'data' } };
     templateReader.read.yields(null, template);
@@ -166,11 +164,11 @@ test('reader', {
 
     sinon.assert.calledOnce(merger.apply);
     sinon.assert.calledWith(merger.apply, items, template.json);
-  }),
+  },
 
 
-  'does not replace existing html': sinon.test(function () {
-    this.stub(merger, 'apply');
+  'does not replace existing html': function () {
+    sandbox.stub(merger, 'apply');
     var items    = [{ html : '<blockquote/>' }];
     var template = { json : { html : '<html/>' } };
     templateReader.read.yields(null, template);
@@ -182,11 +180,11 @@ test('reader', {
     sinon.assert.calledOnce(merger.apply);
     sinon.assert.calledWith(merger.apply,
       [sinon.match.has('html', '<blockquote/>')], template.json);
-  }),
+  },
 
 
-  'uses resolver with merged data': sinon.test(function () {
-    this.stub(resolver, 'resolve');
+  'uses resolver with merged data': function () {
+    sandbox.stub(resolver, 'resolve');
     var items    = [{ heading : 'First' }, { heading : 'Second' }];
     var template = { json : { file : { name : '{heading}' } } };
     templateReader.read.yields(null, template);
@@ -204,6 +202,6 @@ test('reader', {
       file    : { name : '{heading}' },
       heading : 'Second'
     });
-  })
+  }
 
 });
