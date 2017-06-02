@@ -16,16 +16,18 @@ var renderer = require('../lib/html-renderer');
 
 
 var testFile = { path : 'test.html' };
+var sandbox;
 
 
 test('renderer', {
 
   before: function () {
-    sinon.stub(console, 'warn');
+    sandbox = sinon.sandbox.create();
+    sandbox.stub(console, 'warn');
   },
 
   after: function () {
-    console.warn.restore();
+    sandbox.restore();
   },
 
   'returns empty array': function () {
@@ -80,25 +82,23 @@ test('renderer', {
   },
 
 
-  'sets all lists on each item before passing to mustache': sinon.test(
-    function () {
-      this.stub(mustache, 'render');
-      renderer.render([{ file : testFile, html : '<html/>' }], {
-        foo : [{ a : 1 }],
-        bar : [{ b : 2 }]
-      });
+  'sets all lists on each item before passing to mustache': function () {
+    sandbox.stub(mustache, 'render');
+    renderer.render([{ file : testFile, html : '<html/>' }], {
+      foo : [{ a : 1 }],
+      bar : [{ b : 2 }]
+    });
 
-      sinon.assert.calledOnce(mustache.render);
-      sinon.assert.calledWithMatch(mustache.render, '', {
-        foo : [{ a : 1 }],
-        bar : [{ b : 2 }]
-      });
-    }
-  ),
+    sinon.assert.calledOnce(mustache.render);
+    sinon.assert.calledWithMatch(mustache.render, '', {
+      foo : [{ a : 1 }],
+      bar : [{ b : 2 }]
+    });
+  },
 
 
-  'sets item as current on context': sinon.test(function () {
-    this.stub(mustache, 'render');
+  'sets item as current on context': function () {
+    sandbox.stub(mustache, 'render');
     var spy = sinon.spy();
     var context = Object.create({}, {
       current: {
@@ -114,6 +114,6 @@ test('renderer', {
     sinon.assert.calledWith(spy, null);
     sinon.assert.callOrder(spy.withArgs(item), mustache.render,
         spy.withArgs(null));
-  })
+  }
 
 });

@@ -200,7 +200,17 @@ test('list nav', {
 });
 
 
+var sandbox;
+
 test('list createAll', {
+
+  before: function () {
+    sandbox = sinon.sandbox.create();
+  },
+
+  after: function () {
+    sandbox.restore();
+  },
 
   'creates a map of lists for the given config': function () {
     var result = list.createAll([{ n : 1 }, { n : 2 }], {
@@ -214,14 +224,14 @@ test('list createAll', {
     });
   },
 
-  'passes context  and list name to create': sinon.test(function () {
-    this.spy(list, 'create');
+  'passes context  and list name to create': function () {
+    sandbox.spy(list, 'create');
     var context = { some : 'context' };
 
     list.createAll([], { foo : { limit : 1 } }, context);
 
     sinon.assert.calledWith(list.create, sinon.match.any, sinon.match.any,
       context, 'foo');
-  })
+  }
 
 });

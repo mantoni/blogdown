@@ -27,29 +27,24 @@ var EMPTY_META_RESULT = {
   deleted: [],
   meta: {}
 };
-
+var sandbox;
 
 test('blogdown', {
 
   before: function () {
-    sinon.stub(reader, 'read');
-    sinon.stub(writer, 'write');
-    sinon.stub(processor, 'process');
-    sinon.stub(renderer, 'render');
-    sinon.stub(list, 'createAll');
-    sinon.stub(meta, 'update');
-    sinon.stub(meta, 'persist');
+    sandbox = sinon.sandbox.create();
+    sandbox.stub(reader, 'read');
+    sandbox.stub(writer, 'write');
+    sandbox.stub(processor, 'process');
+    sandbox.stub(renderer, 'render');
+    sandbox.stub(list, 'createAll');
+    sandbox.stub(meta, 'update');
+    sandbox.stub(meta, 'persist');
     this.options = { dates : { someFormat : 'dd.MM.YYYY' } };
   },
 
   after: function () {
-    reader.read.restore();
-    writer.write.restore();
-    processor.process.restore();
-    renderer.render.restore();
-    list.createAll.restore();
-    meta.update.restore();
-    meta.persist.restore();
+    sandbox.restore();
   },
 
 
@@ -289,8 +284,8 @@ test('blogdown', {
   },
 
 
-  'logs files that may be deleted': sinon.test(function () {
-    this.stub(console, 'warn');
+  'logs files that may be deleted': function () {
+    sandbox.stub(console, 'warn');
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, {
       created : [],
@@ -306,7 +301,7 @@ test('blogdown', {
     sinon.assert.called(console.warn);
     sinon.assert.calledWith(console.warn,
       '  rm target/deleted.html target/files.html');
-  }),
+  },
 
 
   'yields error and does not continue if reader errs': function () {
@@ -364,7 +359,6 @@ test('blogdown', {
     renderer.render.throws(err);
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
-    renderer.render.returns([]);
 
     blogdown('some/source', 'some/target', this.options, spy);
 
