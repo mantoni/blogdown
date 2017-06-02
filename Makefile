@@ -1,10 +1,7 @@
 SHELL := /bin/bash
 
-default: test
-
-.PHONY: test
-test:
-	@node -e "require('urun')('test', { include: /\-test\.js$$/ });"
+default:
+	@echo "No default target"
 
 version := $(shell node -e "console.log(require('./package.json').version)")
 

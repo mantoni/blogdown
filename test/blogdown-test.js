@@ -5,12 +5,11 @@
  *
  * @license MIT
  */
+/*eslint-env mocha*/
 'use strict';
 
-var test = require('utest');
 var assert = require('assert');
 var sinon = require('sinon');
-
 var blogdown = require('../lib/blogdown');
 var reader = require('../lib/reader');
 var processor = require('../lib/item-processor');
@@ -27,11 +26,12 @@ var EMPTY_META_RESULT = {
   deleted: [],
   meta: {}
 };
-var sandbox;
 
-test('blogdown', {
+describe('blogdown', function () {
+  var sandbox;
+  var options;
 
-  before: function () {
+  beforeEach(function () {
     sandbox = sinon.sandbox.create();
     sandbox.stub(reader, 'read');
     sandbox.stub(writer, 'write');
@@ -40,174 +40,161 @@ test('blogdown', {
     sandbox.stub(list, 'createAll');
     sandbox.stub(meta, 'update');
     sandbox.stub(meta, 'persist');
-    this.options = { dates : { someFormat : 'dd.MM.YYYY' } };
-  },
+    options = { dates : { someFormat : 'dd.MM.YYYY' } };
+  });
 
-  after: function () {
+  afterEach(function () {
     sandbox.restore();
-  },
+  });
 
-
-  'reads the given source': function () {
-    blogdown('some/source', 'some/target', this.options, function () {});
-
-    sinon.assert.calledOnce(reader.read);
-    sinon.assert.calledWith(reader.read, 'some/source', {});
-  },
-
-
-  'reads the given source with publish set to true': function () {
-    this.options.meta = { publish : true };
-
-    blogdown('some/source', 'some/target', this.options, function () {});
+  it('reads the given source', function () {
+    blogdown('some/source', 'some/target', options, function () {});
 
     sinon.assert.calledOnce(reader.read);
     sinon.assert.calledWith(reader.read, 'some/source', {});
-  },
+  });
 
+  it('reads the given source with publish set to true', function () {
+    options.meta = { publish : true };
 
-  'updates meta with items from reader': function () {
+    blogdown('some/source', 'some/target', options, function () {});
+
+    sinon.assert.calledOnce(reader.read);
+    sinon.assert.calledWith(reader.read, 'some/source', {});
+  });
+
+  it('updates meta with items from reader', function () {
     var item = { file : { path : 'some/source/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : {} });
 
-    blogdown('some/source', 'some/target', this.options, function () {});
+    blogdown('some/source', 'some/target', options, function () {});
 
     sinon.assert.calledOnce(meta.update);
     sinon.assert.calledWith(meta.update, [item]);
     sinon.assert.notCalled(processor.process);
-  },
+  });
 
-
-  'passes meta options with target dir to meta': function () {
+  it('passes meta options with target dir to meta', function () {
     reader.read.yields(null, { items : [], partials : {} });
-    this.options.meta = { file : 'other.meta' };
+    options.meta = { file : 'other.meta' };
 
-    blogdown('some/source', 'some/target', this.options, function () {});
+    blogdown('some/source', 'some/target', options, function () {});
 
     sinon.assert.calledWith(meta.update, [], {
       file   : 'other.meta',
       target : 'some/target'
     });
-  },
+  });
 
-
-  'defauts meta options to object with target': function () {
+  it('defauts meta options to object with target', function () {
     reader.read.yields(null, { items : [], partials : {} });
 
-    blogdown('some/source', 'some/target', this.options, function () {});
+    blogdown('some/source', 'some/target', options, function () {});
 
     sinon.assert.calledWith(meta.update, [], { target : 'some/target' });
-  },
+  });
 
-
-  'processes items from reader using given options': function () {
+  it('processes items from reader using given options', function () {
     var item = { file : { path : 'some/source/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : {} });
     meta.update.yields(null, EMPTY_META_RESULT);
 
-    blogdown('some/source', 'some/target', this.options, function () {});
+    blogdown('some/source', 'some/target', options, function () {});
 
     sinon.assert.called(processor.process);
     sinon.assert.calledWith(processor.process, [item],
-        'some/source', this.options);
-  },
+        'some/source', options);
+  });
 
-
-  'creates lists after processing with items from reader': function () {
+  it('creates lists after processing with items from reader', function () {
     var item = { file : { path : 'src/foo' }, some : 'item' };
     var items = [item];
     reader.read.yields(null, { items : items, partials : {} });
     meta.update.yields(null, EMPTY_META_RESULT);
 
-    blogdown('src', 'site', this.options, function () {});
+    blogdown('src', 'site', options, function () {});
 
     sinon.assert.calledOnce(list.createAll);
-    sinon.assert.calledWith(list.createAll, items, this.options.lists);
+    sinon.assert.calledWith(list.createAll, items, options.lists);
     sinon.assert.callOrder(processor.process, list.createAll);
-  },
+  });
 
-
-  'renders items after processing': function () {
+  it('renders items after processing', function () {
     list.createAll.returns({});
     var item = { file : { path : 'src/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
     meta.update.yields(null, EMPTY_META_RESULT);
 
-    blogdown('src', 'site', this.options, function () {});
+    blogdown('src', 'site', options, function () {});
 
     sinon.assert.calledOnce(renderer.render);
     sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
     sinon.assert.callOrder(processor.process, renderer.render);
-  },
+  });
 
-
-  'renders all items after processing if --force': function () {
+  it('renders all items after processing if --force', function () {
     list.createAll.returns({});
     var item = { file : { path : 'src/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : { p : '<p/>' } });
     meta.update.yields(null, EMPTY_META_RESULT);
-    this.options.force = true;
+    options.force = true;
 
-    blogdown('src', 'site', this.options, function () {});
+    blogdown('src', 'site', options, function () {});
 
     sinon.assert.calledOnce(renderer.render);
     sinon.assert.calledWith(renderer.render, [item], {}, { p : '<p/>' });
     sinon.assert.callOrder(processor.process, renderer.render);
-  },
+  });
 
-
-  'passes lists to render': function () {
+  it('passes lists to render', function () {
     var lists = { foo : [{ n : 1 }] };
     list.createAll.returns(lists);
     var item = { file : { path : 'src/foo' }, some : 'item' };
     reader.read.yields(null, { items : [item], partials : {} });
     meta.update.yields(null, EMPTY_META_RESULT);
 
-    blogdown('src', 'site', this.options, function () {});
+    blogdown('src', 'site', options, function () {});
 
     sinon.assert.calledOnce(renderer.render);
     sinon.assert.calledWith(renderer.render, [item], lists, {});
     sinon.assert.callOrder(processor.process, renderer.render);
-  },
+  });
 
-
-  'passes same context into renderer that was passed to lists': function () {
+  it('passes same context into renderer that was passed to lists', function () {
     reader.read.yields(null, { items : [], partials : {} });
     meta.update.yields(null, EMPTY_META_RESULT);
 
-    blogdown('src', 'site', this.options, function () {});
+    blogdown('src', 'site', options, function () {});
 
     var context = renderer.render.firstCall.args[3];
     assert.equal(typeof context, 'object');
     assert.strictEqual(context, list.createAll.firstCall.args[2]);
     assert.equal(context.root, 'src');
-  },
+  });
 
-
-  'writes renderer return value': function () {
+  it('writes renderer return value', function () {
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
     var files = [{ path : 'the/foo', html : '...' }];
     renderer.render.returns(files);
 
-    blogdown('source', 'target', this.options, function () {});
+    blogdown('source', 'target', options, function () {});
 
     sinon.assert.calledOnce(writer.write);
     sinon.assert.calledWith(writer.write, [{
       path : 'the/foo',
       html : '...'
     }], 'target');
-  },
+  });
 
-
-  'errs if writer errs': function () {
+  it('errs if writer errs', function () {
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
     var err = new Error();
     var spy = sinon.spy();
 
-    blogdown('source', 'target', this.options, spy);
+    blogdown('source', 'target', options, spy);
 
     sinon.assert.notCalled(spy);
 
@@ -215,10 +202,9 @@ test('blogdown', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-
-  'passes meta to meta.persist once writer yields': function () {
+  it('passes meta to meta.persist once writer yields', function () {
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, {
       created : [],
@@ -229,62 +215,58 @@ test('blogdown', {
     });
     renderer.render.returns([]);
     writer.write.yields();
-    this.options.meta = { publish : true };
+    options.meta = { publish : true };
 
-    blogdown('source', 'target', this.options, function () {});
+    blogdown('source', 'target', options, function () {});
 
     sinon.assert.calledOnce(meta.persist);
     sinon.assert.calledWith(meta.persist, { some : 'meta' });
-  },
+  });
 
-
-  'passes meta options to meta.persist': function () {
+  it('passes meta options to meta.persist', function () {
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
     writer.write.yields();
-    this.options.meta = { file : 'other.meta', publish : true };
+    options.meta = { file : 'other.meta', publish : true };
 
-    blogdown('source', 'target', this.options, function () {});
+    blogdown('source', 'target', options, function () {});
 
     sinon.assert.calledOnce(meta.persist);
     sinon.assert.calledWithMatch(meta.persist, {}, { file : 'other.meta' });
-  },
+  });
 
-
-  'yields once meta.persist yields': function () {
+  it('yields once meta.persist yields', function () {
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
     writer.write.yields();
-    this.options.meta = { publish : true };
+    options.meta = { publish : true };
     var spy = sinon.spy();
 
-    blogdown('source', 'target', this.options, spy);
+    blogdown('source', 'target', options, spy);
 
     sinon.assert.notCalled(spy);
 
     meta.persist.invokeCallback();
 
     sinon.assert.calledOnce(spy);
-  },
+  });
 
-
-  'yields without persisting if publish is false': function () {
+  it('yields without persisting if publish is false', function () {
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
     writer.write.yields();
     var spy = sinon.spy();
 
-    blogdown('source', 'target', this.options, spy);
+    blogdown('source', 'target', options, spy);
 
     sinon.assert.notCalled(meta.persist);
     sinon.assert.calledOnce(spy);
-  },
+  });
 
-
-  'logs files that may be deleted': function () {
+  it('logs files that may be deleted', function () {
     sandbox.stub(console, 'warn');
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, {
@@ -296,20 +278,19 @@ test('blogdown', {
     renderer.render.returns([]);
     writer.write.yields();
 
-    blogdown('source', 'target', this.options, function () {});
+    blogdown('source', 'target', options, function () {});
 
     sinon.assert.called(console.warn);
     sinon.assert.calledWith(console.warn,
       '  rm target/deleted.html target/files.html');
-  },
+  });
 
-
-  'yields error and does not continue if reader errs': function () {
+  it('yields error and does not continue if reader errs', function () {
     var err = new Error('ouch');
     reader.read.yields(err);
     var spy = sinon.spy();
 
-    blogdown('some/source', 'some/target', this.options, spy);
+    blogdown('some/source', 'some/target', options, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
@@ -318,16 +299,15 @@ test('blogdown', {
     sinon.assert.notCalled(renderer.render);
     sinon.assert.notCalled(writer.write);
     sinon.assert.notCalled(meta.persist);
-  },
+  });
 
-
-  'yields error and does not continue if meta errs': function () {
+  it('yields error and does not continue if meta errs', function () {
     var err = new Error('ouch');
     reader.read.yields(null, { items : [] });
     meta.update.yields(err);
     var spy = sinon.spy();
 
-    blogdown('some/source', 'some/target', this.options, spy);
+    blogdown('some/source', 'some/target', options, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
@@ -335,10 +315,9 @@ test('blogdown', {
     sinon.assert.notCalled(renderer.render);
     sinon.assert.notCalled(writer.write);
     sinon.assert.notCalled(meta.persist);
-  },
+  });
 
-
-  'yields error if processor throws': function () {
+  it('yields error if processor throws', function () {
     var err = new Error('ouch');
     var spy = sinon.spy();
     processor.process.throws(err);
@@ -346,24 +325,23 @@ test('blogdown', {
     meta.update.yields(null, EMPTY_META_RESULT);
     renderer.render.returns([]);
 
-    blogdown('some/source', 'some/target', this.options, spy);
+    blogdown('some/source', 'some/target', options, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-
-  'yields error if renderer throws': function () {
+  it('yields error if renderer throws', function () {
     var err = new Error('ouch');
     var spy = sinon.spy();
     renderer.render.throws(err);
     reader.read.yields(null, { items : [] });
     meta.update.yields(null, EMPTY_META_RESULT);
 
-    blogdown('some/source', 'some/target', this.options, spy);
+    blogdown('some/source', 'some/target', options, spy);
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  }
+  });
 
 });

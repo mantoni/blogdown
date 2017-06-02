@@ -5,36 +5,34 @@
  *
  * @license MIT
  */
+/*eslint-env mocha*/
 'use strict';
 
-var test = require('utest');
 var sinon = require('sinon');
-
 var fs = require('fs');
 var writer = require('../lib/file-writer');
 
+describe('writer', function () {
 
-test('writer', {
-
-  before: function () {
+  beforeEach(function () {
     sinon.stub(fs, 'readFile');
     sinon.stub(fs, 'writeFile');
     sinon.stub(fs, 'mkdirSync');
     sinon.stub(fs, 'existsSync');
     sinon.stub(fs, 'exists');
     sinon.stub(process.stdout, 'write');
-  },
+  });
 
-  after: function () {
+  afterEach(function () {
     fs.readFile.restore();
     fs.writeFile.restore();
     fs.mkdirSync.restore();
     fs.existsSync.restore();
     fs.exists.restore();
     process.stdout.write.restore();
-  },
+  });
 
-  'writes the given items to files': function () {
+  it('writes the given items to files', function () {
     fs.exists.yields(false);
 
     writer.write([{
@@ -48,10 +46,9 @@ test('writer', {
     sinon.assert.calledTwice(fs.writeFile);
     sinon.assert.calledWith(fs.writeFile, 'site/file1.html',  '<h1>foo</h1>');
     sinon.assert.calledWith(fs.writeFile, 'site/file2.json',  '{"h1":"bar"}');
-  },
+  });
 
-
-  'yields once all files where written': function () {
+  it('yields once all files where written', function () {
     fs.exists.yields(false);
     var spy = sinon.spy();
 
@@ -72,9 +69,9 @@ test('writer', {
     fs.writeFile.secondCall.invokeCallback();
 
     sinon.assert.calledOnce(spy);
-  },
+  });
 
-  'creates directory for path before writing file': function () {
+  it('creates directory for path before writing file', function () {
     fs.exists.yields(false);
 
     writer.write([{
@@ -86,9 +83,9 @@ test('writer', {
     sinon.assert.calledWith(fs.mkdirSync, 'target/folder');
     sinon.assert.calledOnce(fs.writeFile);
     sinon.assert.callOrder(fs.mkdirSync, fs.writeFile);
-  },
+  });
 
-  'errs and does not create file if mkdir for root fails': function () {
+  it('errs and does not create file if mkdir for root fails', function () {
     fs.exists.yields(false);
     var spy = sinon.spy();
     var err = new Error();
@@ -102,9 +99,9 @@ test('writer', {
     sinon.assert.notCalled(fs.writeFile);
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-  'errs and does not create file if mkdir for folder fails': function () {
+  it('errs and does not create file if mkdir for folder fails', function () {
     fs.exists.yields(false);
     var spy = sinon.spy();
     var err = new Error();
@@ -118,9 +115,9 @@ test('writer', {
     sinon.assert.notCalled(fs.writeFile);
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-  'does not mkdir if folder already exists': function () {
+  it('does not mkdir if folder already exists', function () {
     fs.exists.yields(false);
     fs.existsSync.returns(true);
 
@@ -134,9 +131,9 @@ test('writer', {
     sinon.assert.calledWith(fs.existsSync, 'target/folder');
     sinon.assert.notCalled(fs.mkdirSync);
     sinon.assert.calledOnce(fs.writeFile);
-  },
+  });
 
-  'does not mkdir if file already exists': function () {
+  it('does not mkdir if file already exists', function () {
     fs.exists.yields(true);
     fs.existsSync.returns(true);
 
@@ -148,9 +145,9 @@ test('writer', {
     sinon.assert.calledOnce(fs.exists);
     sinon.assert.calledWith(fs.exists, 'target/folder/file.json');
     sinon.assert.notCalled(fs.mkdirSync);
-  },
+  });
 
-  'reads file content if it already exists': function () {
+  it('reads file content if it already exists', function () {
     fs.exists.yields(true);
 
     writer.write([{
@@ -163,9 +160,9 @@ test('writer', {
     sinon.assert.calledOnce(fs.readFile);
     sinon.assert.calledWith(fs.readFile, 'site/file.html');
     sinon.assert.notCalled(fs.writeFile);
-  },
+  });
 
-  'writes file if content is different': function () {
+  it('writes file if content is different', function () {
     fs.exists.yields(true);
     fs.readFile.yields(null, new Buffer('<h1>bar</h1>'));
 
@@ -176,9 +173,9 @@ test('writer', {
 
     sinon.assert.calledOnce(fs.writeFile);
     sinon.assert.calledWith(fs.writeFile, 'site/file.html', '<h1>foo</h1>');
-  },
+  });
 
-  'does not write file if content is same': function () {
+  it('does not write file if content is same', function () {
     fs.exists.yields(true);
     fs.readFile.yields(null, new Buffer('<h1>foo</h1>'));
 
@@ -188,9 +185,9 @@ test('writer', {
     }], 'site', function () {});
 
     sinon.assert.notCalled(fs.writeFile);
-  },
+  });
 
-  'does not write file if read failed': function () {
+  it('does not write file if read failed', function () {
     fs.exists.yields(true);
     var error = new Error('Oh noes!');
     fs.readFile.yields(error);
@@ -204,9 +201,9 @@ test('writer', {
     sinon.assert.notCalled(fs.writeFile);
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, error);
-  },
+  });
 
-  'yields if file was not written': function () {
+  it('yields if file was not written', function () {
     fs.exists.yields(true);
     fs.readFile.yields(null, new Buffer('<h1>foo</h1>'));
     var spy = sinon.spy();
@@ -217,7 +214,7 @@ test('writer', {
     }], 'site', spy);
 
     sinon.assert.calledOnce(spy);
-  }
+  });
 
 });
 
