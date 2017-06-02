@@ -1,34 +1,46 @@
 {
-  "name"            : "blogdown",
-  "version"         : "0.7.0",
-  "description"     : "Generate HTML with Mustache and Markdown",
-  "keywords"        : ["html", "generator", "mustache", "markdown", "blog"],
-  "author"          : "Maximilian Antoni (http://maxantoni.de)",
-  "homepage"        : "http://github.com/mantoni/blogdown",
-  "main"            : "./lib/blogdown.js",
-  "bin"             : "bin/blogdown.bin.js",
-  "engines"         : {
-    "node"          : ">=0.8"
+  "name": "blogdown",
+  "version": "0.7.0",
+  "description": "Generate HTML with Mustache and Markdown",
+  "keywords": [
+    "html",
+    "generator",
+    "mustache",
+    "markdown",
+    "blog"
+  ],
+  "author": "Maximilian Antoni (http://maxantoni.de)",
+  "homepage": "http://github.com/mantoni/blogdown",
+  "main": "./lib/blogdown.js",
+  "bin": "bin/blogdown.bin.js",
+  "engines": {
+    "node": ">=0.8"
   },
-  "scripts"         : {
-    "test"          : "make"
+  "scripts": {
+    "test": "make"
   },
-  "repository"      : {
-    "type"          : "git",
-    "url"           : "https://github.com/mantoni/blogdown.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mantoni/blogdown.git"
   },
-  "dependencies"    : {
-    "marked"        : "~0.2.8",
-    "mustache"      : "~0.7.2",
-    "listen"        : "~0.4.0",
-    "moment"        : "~2.0.0",
-    "optimist"      : "~0.3.7"
+  "dependencies": {
+    "marked": "~0.2.8",
+    "mustache": "~0.7.2",
+    "listen": "~0.4.0",
+    "moment": "~2.0.0",
+    "optimist": "~0.3.7"
   },
-  "devDependencies" : {
-    "utest"         : "~0.0.6",
-    "urun"          : "~0.0.6",
-    "sinon"         : "~1.6.0",
-    "autolint"      : "~1.1.3"
+  "devDependencies": {
+    "utest": "~0.0.6",
+    "urun": "~0.0.6",
+    "sinon": "~1.6.0",
+    "autolint": "~1.1.3"
   },
-  "files"           : ["bin", "lib", "README.md", "CHANGES.md", "LICENSE"]
+  "files": [
+    "bin",
+    "lib",
+    "README.md",
+    "CHANGES.md",
+    "LICENSE"
+  ]
 }
