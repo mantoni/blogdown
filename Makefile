@@ -1,9 +1,6 @@
 SHELL := /bin/bash
 
-default: lint test
-
-lint:
-	@node_modules/.bin/autolint --once
+default: test
 
 .PHONY: test
 test:

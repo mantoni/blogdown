@@ -7,36 +7,25 @@
  */
 'use strict';
 
-var test      = require('utest');
-var assert    = require('assert');
-var sinon     = require('sinon');
+var test = require('utest');
+var assert = require('assert');
+var sinon = require('sinon');
 
-var blogdown  = require('../lib/blogdown');
-var reader    = require('../lib/reader');
+var blogdown = require('../lib/blogdown');
+var reader = require('../lib/reader');
 var processor = require('../lib/item-processor');
-var renderer  = require('../lib/html-renderer');
-var writer    = require('../lib/file-writer');
-var list      = require('../lib/list');
-var meta      = require('../lib/meta');
+var renderer = require('../lib/html-renderer');
+var writer = require('../lib/file-writer');
+var list = require('../lib/list');
+var meta = require('../lib/meta');
 
 
 var EMPTY_META_RESULT = {
-  created : [],
-  updated : [],
-  missing : [],
-  deleted : [],
-  meta    : {}
-};
-
-
-var createMetaWithCreated = function (items) {
-  return {
-    created : items,
-    updated : [],
-    missing : [],
-    deleted : [],
-    meta    : {}
-  };
+  created: [],
+  updated: [],
+  missing: [],
+  deleted: [],
+  meta: {}
 };
 
 

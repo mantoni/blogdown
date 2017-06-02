@@ -7,13 +7,12 @@
  */
 'use strict';
 
-var test           = require('utest');
-var assert         = require('assert');
-var sinon          = require('sinon');
+var test = require('utest');
+var sinon = require('sinon');
 
-var fs             = require('fs');
-var fileReader     = require('../lib/file-reader');
-var itemReader     = require('../lib/item-reader');
+var fs = require('fs');
+var fileReader = require('../lib/file-reader');
+var itemReader = require('../lib/item-reader');
 var templateReader = require('../lib/template-reader');
 
 

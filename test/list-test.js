@@ -7,11 +7,11 @@
  */
 'use strict';
 
-var test   = require('utest');
+var test = require('utest');
 var assert = require('assert');
-var sinon  = require('sinon');
+var sinon = require('sinon');
 
-var list   = require('../lib/list');
+var list = require('../lib/list');
 
 
 test('list', {
@@ -23,7 +23,6 @@ test('list', {
   }
 
 });
-
 
 
 test('list limit', {
@@ -166,7 +165,7 @@ test('list nav', {
 
   before: function () {
     var context = this.context = {};
-    this.list = list.create([{ n : 1 }, { n : 2}, { n : 3 }], {}, context);
+    this.list = list.create([{ n : 1 }, { n : 2 }, { n : 3 }], {}, context);
   },
 
   'initialized previous and next with null': function () {

@@ -7,7 +7,7 @@
  */
 'use strict';
 
-var test   = require('utest');
+var test = require('utest');
 var assert = require('assert');
 
 var resolver = require('../lib/resolver');
