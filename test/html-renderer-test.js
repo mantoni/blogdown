@@ -5,39 +5,35 @@
  *
  * @license MIT
  */
+/*eslint-env mocha*/
 'use strict';
 
-var test = require('utest');
 var assert = require('assert');
 var sinon = require('sinon');
-
 var mustache = require('mustache');
 var renderer = require('../lib/html-renderer');
 
-
 var testFile = { path : 'test.html' };
-var sandbox;
 
+describe('renderer', function () {
+  var sandbox;
 
-test('renderer', {
-
-  before: function () {
+  beforeEach(function () {
     sandbox = sinon.sandbox.create();
     sandbox.stub(console, 'warn');
-  },
+  });
 
-  after: function () {
+  afterEach(function () {
     sandbox.restore();
-  },
+  });
 
-  'returns empty array': function () {
+  it('returns empty array', function () {
     var results = renderer.render([], {}, {});
 
     assert.deepEqual(results, []);
-  },
+  });
 
-
-  'returns array with objects of path and html': function () {
+  it('returns array with objects of path and html', function () {
     var results = renderer.render([{
       file : testFile,
       md   : '<p>from markdown</p>',
@@ -48,10 +44,9 @@ test('renderer', {
       path : 'test.html',
       data : '<div><p>from markdown</p></div>'
     }]);
-  },
+  });
 
-
-  'passes partials to mustache': function () {
+  it('passes partials to mustache', function () {
     var results = renderer.render([{
       file : testFile,
       some : 'stuff',
@@ -64,25 +59,22 @@ test('renderer', {
       path : 'test.html',
       data : '<div><h1>stuff</h1></div>'
     }]);
-  },
+  });
 
-
-  'does not create file object if html is missing': function () {
+  it('does not create file object if html is missing', function () {
     var results = renderer.render([{ file : { path : 'unknown' } }], {});
 
     assert.deepEqual(results, []);
-  },
+  });
 
-
-  'logs a warning if html is missing': function () {
+  it('logs a warning if html is missing', function () {
     renderer.render([{ file : { path : 'unknown/foo', name : 'foo' } }], {});
 
     sinon.assert.calledOnce(console.warn);
     sinon.assert.calledWith(console.warn, 'No html for "%s"', 'unknown/foo');
-  },
+  });
 
-
-  'sets all lists on each item before passing to mustache': function () {
+  it('sets all lists on each item before passing to mustache', function () {
     sandbox.stub(mustache, 'render');
     renderer.render([{ file : testFile, html : '<html/>' }], {
       foo : [{ a : 1 }],
@@ -94,10 +86,9 @@ test('renderer', {
       foo : [{ a : 1 }],
       bar : [{ b : 2 }]
     });
-  },
+  });
 
-
-  'sets item as current on context': function () {
+  it('sets item as current on context', function () {
     sandbox.stub(mustache, 'render');
     var spy = sinon.spy();
     var context = Object.create({}, {
@@ -114,6 +105,6 @@ test('renderer', {
     sinon.assert.calledWith(spy, null);
     sinon.assert.callOrder(spy.withArgs(item), mustache.render,
         spy.withArgs(null));
-  }
+  });
 
 });

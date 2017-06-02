@@ -5,28 +5,26 @@
  *
  * @license MIT
  */
+/*eslint-env mocha*/
 'use strict';
 
-var test = require('utest');
 var assert = require('assert');
 var sinon = require('sinon');
-
 var fs = require('fs');
 var processor = require('../lib/item-processor');
 
+describe('processor', function () {
 
-test('processor', {
-
-  before: function () {
+  beforeEach(function () {
     sinon.stub(fs, 'existsSync').returns(false);
     this.item = { file : { path : '' } };
-  },
+  });
 
-  after: function () {
+  afterEach(function () {
     fs.existsSync.restore();
-  },
+  });
 
-  'adds formatted timestamps for file timestamps': function () {
+  it('adds formatted timestamps for file timestamps', function () {
     this.item.file.created  = '1970-01-01T01:00:00+01:00';
     this.item.file.modified = '1970-01-02T02:00:00+01:00';
     this.item.file.rendered = '1970-01-03T03:00:00+01:00';
@@ -50,10 +48,9 @@ test('processor', {
         ('0' + (timezoneOffSet + 1)).slice(-2) + ':00:00');
     assert.equal(this.item.dates.someTime.rendered,
         ('0' + (timezoneOffSet + 2)).slice(-2) + ':00:00');
-  },
+  });
 
-
-  'adds DRAFT for files that are marked as DRAFT': function () {
+  it('adds DRAFT for files that are marked as DRAFT', function () {
     this.item.file.created  = 'DRAFT';
 
     processor.process([this.item], '', {
@@ -69,10 +66,9 @@ test('processor', {
     assert.equal(this.item.dates.someTime.created, 'DRAFT');
     assert.equal(this.item.dates.someTime.modified, 'DRAFT');
     assert.equal(this.item.dates.someTime.rendered, 'DRAFT');
-  },
+  });
 
-
-  'does not add timestamps if file timestamps do not exist': function () {
+  it('does not add timestamps if file timestamps do not exist', function () {
     processor.process([this.item], '', {
       dates      : {
         someTime : 'HH:mm:ss'
@@ -80,24 +76,22 @@ test('processor', {
     });
 
     assert.strictEqual(this.item.dates.someTime, undefined);
-  },
+  });
 
-
-  'checks for processor.js in given path': function () {
+  it('checks for processor.js in given path', function () {
     processor.process([], 'some/path', {});
 
     sinon.assert.calledOnce(fs.existsSync);
     sinon.assert.calledWith(fs.existsSync,
         process.cwd() + '/some/path/processor.js');
-  },
+  });
 
-
-  'requires and calls function exported by processor.js': function () {
+  it('requires and calls function exported by processor.js', function () {
     fs.existsSync.returns(true);
 
     processor.process([this.item], 'test/fixture', {});
 
     assert(this.item.iWasHere);
-  }
+  });
 
 });

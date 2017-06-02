@@ -5,41 +5,38 @@
  *
  * @license MIT
  */
+/*eslint-env mocha*/
 'use strict';
 
-var test = require('utest');
 var sinon = require('sinon');
-
 var fs = require('fs');
 var fileReader = require('../lib/file-reader');
 var itemReader = require('../lib/item-reader');
 var templateReader = require('../lib/template-reader');
 
+describe('template-reader', function () {
+  var sandbox;
 
-test('template-reader', {
+  beforeEach(function () {
+    sandbox = sinon.sandbox.create();
+    sandbox.stub(fileReader, 'read');
+    sandbox.stub(itemReader, 'read');
+    sandbox.stub(fs, 'exists');
+    sandbox.stub(console, 'info');
+  });
 
-  before: function () {
-    sinon.stub(fileReader, 'read');
-    sinon.stub(itemReader, 'read');
-    sinon.stub(fs, 'exists');
-  },
+  afterEach(function () {
+    sandbox.restore();
+  });
 
-  after: function () {
-    fileReader.read.restore();
-    itemReader.read.restore();
-    fs.exists.restore();
-  },
-
-
-  'reads the "template" files from the given directory': function () {
+  it('reads the "template" files from the given directory', function () {
     templateReader.read('foo/bar', {}, function () {});
 
     sinon.assert.calledOnce(fileReader.read);
     sinon.assert.calledWith(fileReader.read, 'foo/bar/template');
-  },
+  });
 
-
-  'yields error from file-reader': function () {
+  it('yields error from file-reader', function () {
     var err = new Error();
     var spy = sinon.spy();
     fileReader.read.yields(err);
@@ -50,37 +47,33 @@ test('template-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-
-  'checks whether a template folder exists in the given path': function () {
+  it('checks whether a template folder exists in the given path', function () {
     templateReader.read('foo/bar', {}, function () {});
 
     sinon.assert.calledOnce(fs.exists);
     sinon.assert.calledWith(fs.exists, 'foo/bar/template');
-  },
+  });
 
-
-  'invokes items-reader if template exists': function () {
+  it('invokes items-reader if template exists', function () {
     fs.exists.yields(true);
 
     templateReader.read('foo', {}, function () {});
 
     sinon.assert.calledOnce(itemReader.read);
     sinon.assert.calledWith(itemReader.read, 'foo/template');
-  },
+  });
 
-
-  'does not invoke items-reader if template is missing': function () {
+  it('does not invoke items-reader if template is missing', function () {
     fs.exists.yields(false);
 
     templateReader.read('foo', {}, function () {});
 
     sinon.assert.notCalled(itemReader.read);
-  },
+  });
 
-
-  'yields error from items-reader': function () {
+  it('yields error from items-reader', function () {
     var err = new Error();
     var spy = sinon.spy();
     fs.exists.yields(true);
@@ -91,10 +84,9 @@ test('template-reader', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-
-  'yields null and fileReader results': function () {
+  it('yields null and fileReader results', function () {
     fileReader.read.yields(null, {
       html : '<html/>',
       v    : 42
@@ -109,10 +101,9 @@ test('template-reader', {
       json     : { html : '<html/>', v : 42 },
       partials : {}
     });
-  },
+  });
 
-
-  'merges item-reader result and parent template': function () {
+  it('merges item-reader result and parent template', function () {
     var spy = sinon.spy();
     fileReader.read.yields(null, {});
     fs.exists.yields(true);
@@ -134,10 +125,9 @@ test('template-reader', {
       partials : { p : '<p/>', b : '<b/>' },
       json     : { a : { v : 42 }, the : 'template' }
     });
-  },
+  });
 
-
-  'merges template result and parent template': function () {
+  it('merges template result and parent template', function () {
     var spy = sinon.spy();
     fileReader.read.yields(null, {
       html : '<html/>',
@@ -155,10 +145,9 @@ test('template-reader', {
       partials : { t1 : '<i>t</i>' },
       json     : { html : '<html/>', the : 'template', v : 42 }
     });
-  },
+  });
 
-
-  'merges template and item-reader results': function () {
+  it('merges template and item-reader results', function () {
     var spy = sinon.spy();
     fileReader.read.yields(null, {
       html : '<html/>',
@@ -178,25 +167,24 @@ test('template-reader', {
       partials : { x : '<p/>' },
       json     : { html : '<html/>', v1 : 1, x : { v2 : 2 } }
     });
-  },
+  });
 
+  it('yields empty partials and json objects if no template found',
+    function () {
+      var spy = sinon.spy();
+      fileReader.read.yields(null, {});
+      fs.exists.yields(false);
 
-  'yields empty partials and json objects if no template found': function () {
-    var spy = sinon.spy();
-    fileReader.read.yields(null, {});
-    fs.exists.yields(false);
+      templateReader.read('foo', {}, spy);
 
-    templateReader.read('foo', {}, spy);
-
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, {
-      partials : {},
-      json     : {}
+      sinon.assert.calledOnce(spy);
+      sinon.assert.calledWith(spy, null, {
+        partials : {},
+        json     : {}
+      });
     });
-  },
 
-
-  'yields parent template if no template found': function () {
+  it('yields parent template if no template found', function () {
     var spy = sinon.spy();
     fileReader.read.yields(null, {});
     fs.exists.yields(false);
@@ -211,6 +199,6 @@ test('template-reader', {
       partials : { p : '<p/>' },
       json     : { v : 42 }
     });
-  }
+  });
 
 });

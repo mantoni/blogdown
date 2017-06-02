@@ -18,7 +18,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "make",
+    "test": "mocha",
+    "watch": "mocha --watch",
     "posttest": "npm run lint"
   },
   "repository": {
@@ -34,9 +35,8 @@
   },
   "devDependencies": {
     "eslint": "^3.19.0",
-    "sinon": "^2.3.2",
-    "urun": "~0.0.6",
-    "utest": "~0.0.6"
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.2"
   },
   "files": [
     "bin",

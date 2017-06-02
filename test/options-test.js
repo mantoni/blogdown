@@ -5,35 +5,31 @@
  *
  * @license MIT
  */
+/*eslint-env mocha*/
 'use strict';
 
-var test = require('utest');
 var sinon = require('sinon');
-
 var fileReader = require('../lib/file-reader');
 var options = require('../lib/options');
 
+describe('options read', function () {
 
-test('options read', {
-
-  before: function () {
+  beforeEach(function () {
     sinon.stub(fileReader, 'read');
-  },
+  });
 
-  after: function () {
+  afterEach(function () {
     fileReader.read.restore();
-  },
+  });
 
-
-  'reads file using the given path': function () {
+  it('reads file using the given path', function () {
     options.read('some/path', function () {});
 
     sinon.assert.calledOnce(fileReader.read);
     sinon.assert.calledWith(fileReader.read, 'some/path');
-  },
+  });
 
-
-  'yields error from file reader': function () {
+  it('yields error from file reader', function () {
     var spy = sinon.spy();
     var err = new Error();
     fileReader.read.yields(err);
@@ -42,10 +38,9 @@ test('options read', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, err);
-  },
+  });
 
-
-  'yields item without "file" info from file reader': function () {
+  it('yields item without "file" info from file reader', function () {
     var spy    = sinon.spy();
     var result = { some : 'options', file : { name : 'foo' } };
     fileReader.read.yields(null, result);
@@ -54,6 +49,6 @@ test('options read', {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, { some : 'options' });
-  }
+  });
 
 });
