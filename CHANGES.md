@@ -1,5 +1,26 @@
 # Changes
 
+## 1.1.0
+
+- [`6731ebf`](https://github.com/mantoni/blogdown/commit/6731ebf7abae951bc03425f8a2c50126014dc984)
+  allow lines before json header (#13) (Maksim Lin)
+    >
+    > * dont make json header start on first line of file
+    >
+    > this allows json header to start on lines other than first line of a file,
+    > and so allow bracketing it with jekyll style front-matter '---' lines
+    >
+    > * update to latest package versions
+    >
+    > * better handling of frontmatter, add test
+    >
+- [`fc15fe7`](https://github.com/mantoni/blogdown/commit/fc15fe7bc033511eb2c6b52dc01e99aba45fa626)
+  Make list sort test pass on different node versions
+- [`3a5a6a9`](https://github.com/mantoni/blogdown/commit/3a5a6a9099b7e248dd9bc667aa827ec2708fbe19)
+  Update Studio Changes to v2
+
+_Released by [Maximilian Antoni](https://github.com/mantoni) on 2020-01-17._
+
 ## 1.0.0
 
 - Add contributor
