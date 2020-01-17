@@ -91,7 +91,7 @@ describe('list sort', function () {
     function () {
       assert.throws(function () {
         list.create([{ a : { b : 1 } }, { a : { c : 2 } }], { sort : 'a.b.c' });
-      }, /^Error\: Cannot sort list by "a\.b\.c"; Unknown property "c"$/);
+      }, /^Error\: Cannot sort list by "a\.b\.c"; Unknown property/);
     });
 
 });
