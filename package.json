@@ -25,7 +25,7 @@
     "watch": "mocha --watch",
     "posttest": "npm run lint",
     "preversion": "npm test",
-    "version": "changes",
+    "version": "changes --commits --footer",
     "postversion": "git push --follow-tags && npm publish"
   },
   "repository": {
@@ -40,7 +40,7 @@
     "optimist": "^0.6.1"
   },
   "devDependencies": {
-    "@studio/changes": "^1.2.0",
+    "@studio/changes": "^2.0.0",
     "eslint": "^3.19.0",
     "mocha": "^3.4.2",
     "sinon": "^2.3.2"
