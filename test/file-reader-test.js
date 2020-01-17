@@ -425,6 +425,23 @@ describe('file-reader', function () {
     });
   });
 
+
+  it('uses json if front-matter on first line but not json inside markdown',
+  function () {
+    fs.exists.withArgs('some/test.md').yields(true);
+    fs.readFile.withArgs('some/test.md').yields(null,
+        new Buffer('---\n{\n "some": "json"\n}\n---\nTest`{"a" : "b"}`'));
+    var spy = sinon.spy();
+
+    fileReader.read('some/test', {}, spy);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, null, {
+      md : '<p>Test<code>{&quot;a&quot; : &quot;b&quot;}</code></p>',
+      some : 'json'
+    });
+  });
+
   it('reads multiline json at top of html', function () {
     fs.exists.withArgs('some/test.html').yields(true);
     fs.readFile.withArgs('some/test.html').yields(null,
