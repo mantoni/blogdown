@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "listen": "^1.0.1",
-    "marked": "^0.3.6",
+    "marked": "^4.0.10",
     "moment": "^2.18.1",
     "mustache": "^2.3.0",
     "optimist": "^0.6.1"
